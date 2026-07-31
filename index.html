@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>note-research-mikke | note悩みリサーチ＆構成自動生成ツール</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Marked.js for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            note: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              dark: '#222222',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Markdown スタイリングのカスタマイズ */
+    .prose h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-top: 1.75rem;
+      margin-bottom: 0.75rem;
+      padding-left: 0.75rem;
+      border-left: 4px solid #22c55e;
+      background-color: #f8fafc;
+      padding-top: 0.375rem;
+      padding-bottom: 0.375rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+    }
+    .prose h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .prose ul {
+      list-style-type: disc;
+      padding-left: 1.25rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .prose li {
+      margin-bottom: 0.375rem;
+      color: #334155;
+    }
+    .prose p {
+      margin-bottom: 0.875rem;
+      color: #334155;
+      line-height: 1.7;
+    }
+    .prose strong {
+      color: #15803d;
+      font-weight: 600;
+    }
+    .prose hr {
+      border: 0;
+      border-top: 1px dashed #cbd5e1;
+      margin: 1.5rem 0;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- ヘッダー -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-note-500 text-white flex items-center justify-center font-bold text-xl shadow-sm">
+          み
+        </div>
+        <div>
+          <h1 class="text-base font-bold text-slate-900 leading-tight flex items-center gap-2">
+            note-research-mikke
+            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v1.0</span>
+          </h1>
+          <p class="text-xs text-slate-500">悩みリサーチ ＆ 売れる有料構成案メーカー</p>
+        </div>
+      </div>
+      <button onclick="toggleSettingsModal()" class="text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-xl hover:bg-slate-100 transition flex items-center gap-1.5 text-xs font-semibold border border-slate-200">
+        <i class="fa-solid fa-gear text-slate-500"></i>
+        <span>設定</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
+
+    <!-- 入力フォームエリア -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
+      <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-magnifying-glass text-note-500"></i> リサーチ条件を設定
+      </h2>
+
+      <form id="researchForm" onsubmit="handleFormSubmit(event)" class="space-y-5">
+        <!-- メインテーマ -->
+        <div>
+          <label for="theme" class="block text-xs font-bold text-slate-700 mb-1.5">
+            メインテーマ <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="theme" 
+            required
+            placeholder="例: 50代からのキャリア再設計、ゴルフ 100切りの練習法、生成AI 副業" 
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-note-500 focus:border-transparent transition text-sm"
+          >
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- ターゲット層 -->
+          <div>
+            <label for="target" class="block text-xs font-bold text-slate-700 mb-1.5">
+              ターゲット層（任意）
+            </label>
+            <input 
+              type="text" 
+              id="target" 
+              placeholder="例: 将来に不安を感じる40〜50代、100切りに悩む会社員" 
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-note-500 focus:border-transparent transition text-sm"
+            >
+          </div>
+
+          <!-- 文体・トーン -->
+          <div>
+            <label for="tone" class="block text-xs font-bold text-slate-700 mb-1.5">
+              文章のトーン
+            </label>
+            <select 
+              id="tone" 
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-note-500 focus:border-transparent transition text-sm bg-white"
+            >
+              <option value="親しみやすく共感重視">親しみやすく共感重視（です・ます）</option>
+              <option value="論理的でプロフェッショナル">論理的でプロフェッショナル（だ・である）</option>
+              <option value="熱量が高く背中を押す文体">熱量が高く背中を押すスタイル</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 生成ボタン -->
+        <button 
+          type="submit" 
+          id="submitBtn"
+          class="w-full bg-note-500 hover:bg-note-600 text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow-md transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
+        >
+          <i class="fa-solid fa-wand-magic-sparkles"></i> 悩みをリサーチ＆無料・有料構成案を生成
+        </button>
+      </form>
+    </section>
+
+    <!-- ローディング表示 -->
+    <div id="loadingArea" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm mb-8">
+      <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-note-500 border-t-transparent mb-3"></div>
+      <p class="text-slate-800 font-bold text-base">悩みをディープリサーチ中...</p>
+      <p class="text-slate-500 text-xs mt-1">ターゲットのリアルな本音と、売れる有料導線を組み立てています（20〜30秒かかります）</p>
+    </div>
+
+    <!-- 生成結果出力エリア -->
+    <section id="resultArea" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+      <!-- アクションバー -->
+      <div class="bg-slate-50 border-b border-slate-200 px-6 py-3 flex flex-wrap justify-between items-center gap-3">
+        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-file-lines text-note-600"></i> 生成結果（構成プロット）
+        </span>
+        <div class="flex items-center gap-2">
+          <button onclick="copyToClipboard()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs">
+            <i class="fa-regular fa-copy"></i> 全文コピー
+          </button>
+          <button onclick="downloadAsText()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs">
+            <i class="fa-solid fa-download"></i> TXT保存
+          </button>
+        </div>
+      </div>
+
+      <!-- 生成された本文（Markdownプレビュー） -->
+      <div id="resultContent" class="p-6 sm:p-8 prose max-w-none text-slate-800 text-sm sm:text-base leading-relaxed">
+      </div>
+    </section>
+
+    <!-- 過去の履歴セクション -->
+    <section id="historySection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hidden">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-slate-500"></i> リサーチ履歴（直近5件）
+        </h2>
+        <button onclick="clearHistory()" class="text-xs text-rose-500 hover:underline">履歴を全消去</button>
+      </div>
+      <div id="historyList" class="space-y-2">
+        <!-- JSで動的生成 -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 設定モーダル（Worker URL設定） -->
+  <div id="settingsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden px-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-note-500"></i> アプリ連携設定
+        </h3>
+        <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-slate-600">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <label for="workerUrl" class="block text-xs font-bold text-slate-700 mb-1">
+            Cloudflare Worker URL <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            type="url" 
+            id="workerUrl" 
+            placeholder="https://note-research-mikke-api.xxxx.workers.dev" 
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-note-500 focus:outline-none"
+          >
+          <p class="text-[11px] text-slate-500 mt-1">デプロイした Cloudflare Worker の Endpoint URL を設定してください。</p>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end">
+        <button onclick="saveSettings()" class="bg-note-500 hover:bg-note-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition">
+          設定を保存する
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- フッター -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
+    &copy; note-research-mikke - AI Powered Note Writing Assistant
+  </footer>
+
+  <!-- フロントエンドJavaScript -->
+  <script>
+    let currentMarkdown = '';
+    const STORAGE_KEY_WORKER = 'mikke_worker_url';
+    const STORAGE_KEY_HISTORY = 'mikke_research_history';
+
+    // 初期化処理
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedWorkerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
+      if (savedWorkerUrl) {
+        document.getElementById('workerUrl').value = savedWorkerUrl;
+      }
+      renderHistory();
+    });
+
+    // モーダル切替
+    function toggleSettingsModal() {
+      const modal = document.getElementById('settingsModal');
+      modal.classList.toggle('hidden');
+    }
+
+    // 設定保存
+    function saveSettings() {
+      const url = document.getElementById('workerUrl').value.trim();
+      if (!url) {
+        alert('Worker URLを入力してください。');
+        return;
+      }
+      localStorage.setItem(STORAGE_KEY_WORKER, url);
+      toggleSettingsModal();
+      alert('設定を保存しました！');
+    }
+
+    // フォーム送信ハンドラ
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const workerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
+      
+      const theme = document.getElementById('theme').value.trim();
+      const target = document.getElementById('target').value.trim();
+      const tone = document.getElementById('tone').value;
+
+      if (!theme) return;
+
+      // Worker URL未設定時のUIプレビュー用ダミー応答フォールバック
+      if (!workerUrl) {
+        if (confirm('Cloudflare Worker URLが未設定です。\n設定画面を開いてURLを設定しますか？\n（「キャンセル」を押すとUIテスト用のデモ結果を表示します）')) {
+          toggleSettingsModal();
+          return;
+        }
+      }
+
+      // UI状態の変更
+      document.getElementById('loadingArea').classList.remove('hidden');
+      document.getElementById('resultArea').classList.add('hidden');
+      document.getElementById('submitBtn').disabled = true;
+      document.getElementById('submitBtn').classList.add('opacity-50', 'cursor-not-allowed');
+
+      try {
+        if (workerUrl) {
+          // 本番Workerリクエスト
+          const response = await fetch(workerUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ theme, target, tone })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'APIリクエスト中にエラーが発生しました。');
+          }
+
+          currentMarkdown = data.result;
+        } else {
+          // Worker未設定時のプレビュー・デモ出力
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          currentMarkdown = generateDemoMarkdown(theme, target, tone);
+        }
+
+        // マークダウンの描画
+        document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
+        document.getElementById('resultArea').classList.remove('hidden');
+        
+        // 結果位置へスクロール
+        document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+
+        // 履歴保存
+        saveToHistory(theme, currentMarkdown);
+
+      } catch (err) {
+        alert(`エラー: ${err.message}`);
+      } finally {
+        document.getElementById('loadingArea').classList.add('hidden');
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('submitBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    // 全文コピー
+    function copyToClipboard() {
+      if (!currentMarkdown) return;
+      const textarea = document.createElement('textarea');
+      textarea.value = currentMarkdown;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      alert('構成案（Markdown形式）をクリップボードにコピーしました！');
+    }
+
+    // テキスト保存
+    function downloadAsText() {
+      if (!currentMarkdown) return;
+      const theme = document.getElementById('theme').value.trim() || 'note_kousei';
+      const blob = new Blob([currentMarkdown], { type: 'text/plain;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${theme}_構成案.txt`;
+      link.click();
+    }
+
+    // 履歴管理
+    function saveToHistory(theme, content) {
+      let history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY) || '[]');
+      const newItem = {
+        id: Date.now(),
+        theme: theme,
+        date: new Date().toLocaleDateString('ja-JP'),
+        content: content
+      };
+      history.unshift(newItem);
+      if (history.length > 5) history.pop();
+      
+      localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY) || '[]');
+      const section = document.getElementById('historySection');
+      const list = document.getElementById('historyList');
+
+      if (history.length === 0) {
+        section.classList.add('hidden');
+        return;
+      }
+
+      section.classList.remove('hidden');
+      list.innerHTML = history.map(item => `
+        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition cursor-pointer" onclick="loadHistoryItem(${item.id})">
+          <div class="truncate pr-4">
+            <p class="text-xs font-bold text-slate-800 truncate">${escapeHtml(item.theme)}</p>
+            <p class="text-[10px] text-slate-400">${item.date}</p>
+          </div>
+          <span class="text-xs text-note-600 font-semibold flex items-center gap-1 shrink-0">
+            表示 <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          </span>
+        </div>
+      `).join('');
+    }
+
+    function loadHistoryItem(id) {
+      const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY) || '[]');
+      const item = history.find(h => h.id === id);
+      if (item) {
+        currentMarkdown = item.content;
+        document.getElementById('theme').value = item.theme;
+        document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
+        document.getElementById('resultArea').classList.remove('hidden');
+        document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function clearHistory() {
+      if (confirm('履歴をすべて消去しますか？')) {
+        localStorage.removeItem(STORAGE_KEY_HISTORY);
+        renderHistory();
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    function generateDemoMarkdown(theme, target, tone) {
+      return `## 1. 読者のペルソナとリアルな悩み
+・**ターゲットの状況:** ${target || '現状を打破したいと考えているビジネスパーソン'}
+・**抱えている切実な悩み（本音）:**
+  1. 「何から手をつければいいのか具体的に分からず立ち止まっている」
+  2. 「独学で試したものの、継続できず成果が出ない」
+  3. 「失敗して時間やお金を無駄にするのが怖い」
+・**検索意図・キーワード:** \`${theme} 悩み\`, \`${theme} 初心者 解決\`, \`${theme} 失敗事例\`
+
+---
+
+## 2. 無料記事の構成案（共感・理由・ロードマップ）
+・**タイトル案:**
+  1. 【保存版】${theme}で絶対につまずかないための完全ロードマップ
+  2. なぜ${theme}は挫折しやすいのか？知っておくべき共通の罠
+  3. ${target || '初心者'}必見！${theme}をスムーズに進める基本思考法
+・**導入:** 悩みに寄り添い、「あなたの努力不足ではなく手順の問題である」と安心感を与える。
+・**本文:** 失敗する人の3つの共通点と、正しいアプローチの全体像を提示。
+・**まとめ:** 全体像の振り返りと、次の「実践ステップ」への意欲を高める。
+
+---
+
+## 3. 【有料切り替えの境界線】
+・**無料部分で伝えること:** 「なぜそれが必要なのか（Why）」と「全体のロードマップ（What）」
+・**有料部分で伝えること:** 「明日から使える具体的な実践手順（How）」と「チェックリスト・型」
+・**誘導フレーズ:** *「ここまでは全体の考え方を解説しました。ここから先は、私が実際に成果を出した『具体的なステップと実践シート』を限定公開します。」*
+
+---
+
+## 4. 有料記事の構成案（実践ノウハウ・特典）
+・**タイトル案:**
+  1. 【実践編】${theme}で結果を出すための具体手順＆完全チェックシート
+・**具体ステップ:** Step 1〜Step 3の着手手順をスクショや例を交えて解説。
+・**購入者特典:** 「そのまま使えるアクションプランシート（PDF/テンプレート）」`;
+    }
+  </script>
+</body>
+</html>
