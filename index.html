@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>note-research-mikke | note悩みリサーチ＆構成自動生成ツール</title>
   
+  <!-- Favicon (緑背景に白文字の「み」アイコン) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%2322c55e'/><text x='50' y='72' font-size='64' font-weight='bold' text-anchor='middle' fill='white' font-family='sans-serif'>み</text></svg>">
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -80,7 +83,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
 
-  <!-- ヘッダー -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
     <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center space-x-3">
@@ -102,10 +104,8 @@
     </div>
   </header>
 
-  <!-- メインコンテンツ -->
   <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
 
-    <!-- 入力フォームエリア -->
     <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
       <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
         <i class="fa-solid fa-magnifying-glass text-note-500"></i> リサーチ条件を設定
@@ -167,7 +167,6 @@
       </form>
     </section>
 
-    <!-- ローディング表示 -->
     <div id="loadingArea" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm mb-8">
       <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-note-500 border-t-transparent mb-3"></div>
       <p class="text-slate-800 font-bold text-base">悩みをディープリサーチ中...</p>
@@ -196,7 +195,6 @@
       </div>
     </section>
 
-    <!-- 過去の履歴セクション -->
     <section id="historySection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hidden">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
@@ -211,7 +209,6 @@
 
   </main>
 
-  <!-- 設定モーダル（Worker URL設定） -->
   <div id="settingsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden px-4">
     <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200">
       <div class="flex justify-between items-center mb-4">
@@ -231,10 +228,10 @@
           <input 
             type="url" 
             id="workerUrl" 
-            placeholder="https://note-research-mikke-api.xxxx.workers.dev" 
+            placeholder="https://note-research-mikke.yymmatsu.workers.dev" 
             class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-note-500 focus:outline-none"
           >
-          <p class="text-[11px] text-slate-500 mt-1">デプロイした Cloudflare Worker の Endpoint URL を設定してください。</p>
+          <p class="text-[11px] text-slate-500 mt-1">作成した Cloudflare Worker の Endpoint URL を設定します。</p>
         </div>
       </div>
 
@@ -246,12 +243,10 @@
     </div>
   </div>
 
-  <!-- フッター -->
   <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
     &copy; note-research-mikke - AI Powered Note Writing Assistant
   </footer>
 
-  <!-- フロントエンドJavaScript -->
   <script>
     let currentMarkdown = '';
     const STORAGE_KEY_WORKER = 'mikke_worker_url';
@@ -259,10 +254,9 @@
 
     // 初期化処理
     document.addEventListener('DOMContentLoaded', () => {
-      const savedWorkerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
-      if (savedWorkerUrl) {
-        document.getElementById('workerUrl').value = savedWorkerUrl;
-      }
+      const savedWorkerUrl = localStorage.getItem(STORAGE_KEY_WORKER) || 'https://note-research-mikke.yymmatsu.workers.dev';
+      document.getElementById('workerUrl').value = savedWorkerUrl;
+      localStorage.setItem(STORAGE_KEY_WORKER, savedWorkerUrl);
       renderHistory();
     });
 
@@ -281,7 +275,7 @@
       }
       localStorage.setItem(STORAGE_KEY_WORKER, url);
       toggleSettingsModal();
-      alert('設定を保存しました！');
+      alert('Worker URL設定を保存しました！');
     }
 
     // フォーム送信ハンドラ
@@ -289,20 +283,11 @@
       e.preventDefault();
       
       const workerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
-      
       const theme = document.getElementById('theme').value.trim();
       const target = document.getElementById('target').value.trim();
       const tone = document.getElementById('tone').value;
 
       if (!theme) return;
-
-      // Worker URL未設定時のUIプレビュー用ダミー応答フォールバック
-      if (!workerUrl) {
-        if (confirm('Cloudflare Worker URLが未設定です。\n設定画面を開いてURLを設定しますか？\n（「キャンセル」を押すとUIテスト用のデモ結果を表示します）')) {
-          toggleSettingsModal();
-          return;
-        }
-      }
 
       // UI状態の変更
       document.getElementById('loadingArea').classList.remove('hidden');
@@ -327,7 +312,7 @@
 
           currentMarkdown = data.result;
         } else {
-          // Worker未設定時のプレビュー・デモ出力
+          // テストフォールバック
           await new Promise(resolve => setTimeout(resolve, 1500));
           currentMarkdown = generateDemoMarkdown(theme, target, tone);
         }
@@ -374,7 +359,6 @@
       link.click();
     }
 
-    // 履歴管理
     function saveToHistory(theme, content) {
       let history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY) || '[]');
       const newItem = {
@@ -446,7 +430,7 @@
   1. 「何から手をつければいいのか具体的に分からず立ち止まっている」
   2. 「独学で試したものの、継続できず成果が出ない」
   3. 「失敗して時間やお金を無駄にするのが怖い」
-・**検索意図・キーワード:** \`${theme} 悩み\`, \`${theme} 初心者 解決\`, \`${theme} 失敗事例\`
+・**検索意図・キーワード:** \`${theme} 悩み\`, \`${theme} 初心者 解決\`
 
 ---
 
@@ -454,16 +438,14 @@
 ・**タイトル案:**
   1. 【保存版】${theme}で絶対につまずかないための完全ロードマップ
   2. なぜ${theme}は挫折しやすいのか？知っておくべき共通の罠
-  3. ${target || '初心者'}必見！${theme}をスムーズに進める基本思考法
 ・**導入:** 悩みに寄り添い、「あなたの努力不足ではなく手順の問題である」と安心感を与える。
 ・**本文:** 失敗する人の3つの共通点と、正しいアプローチの全体像を提示。
-・**まとめ:** 全体像の振り返りと、次の「実践ステップ」への意欲を高める。
 
 ---
 
 ## 3. 【有料切り替えの境界線】
-・**無料部分で伝えること:** 「なぜそれが必要なのか（Why）」と「全体のロードマップ（What）」
-・**有料部分で伝えること:** 「明日から使える具体的な実践手順（How）」と「チェックリスト・型」
+・**無料部分:** 「なぜそれが必要なのか（Why）」と「全体のロードマップ（What）」
+・**有料部分:** 「明日から使える具体的な実践手順（How）」と「テンプレート」
 ・**誘導フレーズ:** *「ここまでは全体の考え方を解説しました。ここから先は、私が実際に成果を出した『具体的なステップと実践シート』を限定公開します。」*
 
 ---
@@ -471,7 +453,6 @@
 ## 4. 有料記事の構成案（実践ノウハウ・特典）
 ・**タイトル案:**
   1. 【実践編】${theme}で結果を出すための具体手順＆完全チェックシート
-・**具体ステップ:** Step 1〜Step 3の着手手順をスクショや例を交えて解説。
 ・**購入者特典:** 「そのまま使えるアクションプランシート（PDF/テンプレート）」`;
     }
   </script>
