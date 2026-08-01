@@ -34,7 +34,6 @@
     }
   </script>
   <style>
-    /* Markdown スタイリングのカスタマイズ */
     .prose h2 {
       font-size: 1.2rem;
       font-weight: 700;
@@ -74,6 +73,26 @@
       color: #15803d;
       font-weight: 600;
     }
+    .prose code {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      font-size: 0.875em;
+    }
+    .prose pre {
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .prose pre code {
+      background-color: transparent;
+      color: inherit;
+      padding: 0;
+    }
     .prose hr {
       border: 0;
       border-top: 1px dashed #cbd5e1;
@@ -92,7 +111,7 @@
         <div>
           <h1 class="text-base font-bold text-slate-900 leading-tight flex items-center gap-2">
             note-research-mikke
-            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v1.0</span>
+            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v1.2</span>
           </h1>
           <p class="text-xs text-slate-500">悩みリサーチ ＆ 売れる有料構成案メーカー</p>
         </div>
@@ -162,7 +181,7 @@
           id="submitBtn"
           class="w-full bg-note-500 hover:bg-note-600 text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow-md transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
         >
-          <i class="fa-solid fa-wand-magic-sparkles"></i> 悩みをリサーチ＆無料・有料構成案を生成
+          <i class="fa-solid fa-wand-magic-sparkles"></i> 悩みをリサーチ＆無料・有料構成案・Midjourneyプロンプトを生成
         </button>
       </form>
     </section>
@@ -170,7 +189,7 @@
     <div id="loadingArea" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm mb-8">
       <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-note-500 border-t-transparent mb-3"></div>
       <p class="text-slate-800 font-bold text-base">悩みをディープリサーチ中...</p>
-      <p class="text-slate-500 text-xs mt-1">ターゲットのリアルな本音と、売れる有料導線を組み立てています（20〜30秒かかります）</p>
+      <p class="text-slate-500 text-xs mt-1">ターゲットのリアルな本音、売れる有料導線、Midjourney用プロンプトを構築中（20〜30秒）</p>
     </div>
 
     <!-- 生成結果出力エリア -->
@@ -186,6 +205,9 @@
           </button>
           <button onclick="copySnsToClipboard()" class="px-3 py-1.5 bg-note-50 border border-note-200 rounded-lg text-xs font-medium text-note-700 hover:bg-note-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
             <i class="fa-solid fa-share-nodes text-note-600"></i> SNS告知文コピー
+          </button>
+          <button onclick="copyMidjourneyToClipboard()" class="px-3 py-1.5 bg-purple-50 border border-purple-200 rounded-lg text-xs font-medium text-purple-700 hover:bg-purple-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
+            <i class="fa-solid fa-image text-purple-600"></i> Midjourneyプロンプトコピー
           </button>
           <button onclick="downloadAsText()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
             <i class="fa-solid fa-download"></i> TXT保存
@@ -357,7 +379,7 @@
 
         // 履歴保存
         saveToHistory(theme, currentMarkdown);
-        showToast('構成案の生成が完了しました！');
+        showToast('構成案＆Midjourneyプロンプトの生成が完了しました！');
 
       } catch (err) {
         showToast(`エラー: ${err.message}`, true);
@@ -371,16 +393,26 @@
     // 全文コピー
     function copyToClipboard() {
       if (!currentMarkdown) return;
-      copyText(currentMarkdown, '構成案およびSNS告知文（全文）をコピーしました！');
+      copyText(currentMarkdown, '構成案・SNS文章・Midjourneyプロンプト（全文）をコピーしました！');
     }
 
     // SNS告知文のみコピー
     function copySnsToClipboard() {
       if (!currentMarkdown) return;
-      // セクション5（4大SNS集客告知）を抽出
-      const snsMatch = currentMarkdown.match(/## 5\.\s*4大SNS集客告知コピー[\s\S]*/i);
+      const snsMatch = currentMarkdown.match(/## 5\.\s*4大SNS集客告知コピー[\s\S]*?(?=## 6\.|Text$|$)/i);
       if (snsMatch) {
         copyText(snsMatch[0], '4大SNS集客告知コピーを抽出コピーしました！');
+      } else {
+        copyText(currentMarkdown, '全文をコピーしました！');
+      }
+    }
+
+    // Midjourneyプロンプトのみコピー
+    function copyMidjourneyToClipboard() {
+      if (!currentMarkdown) return;
+      const mjMatch = currentMarkdown.match(/## 6\.\s*note見出し画像用 Midjourney 生成プロンプト[\s\S]*/i);
+      if (mjMatch) {
+        copyText(mjMatch[0], 'Midjourney用プロンプトを抽出コピーしました！');
       } else {
         copyText(currentMarkdown, '全文をコピーしました！');
       }
@@ -413,7 +445,7 @@
       const blob = new Blob([currentMarkdown], { type: 'text/plain;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `${theme}_構成案.txt`;
+      link.download = `${theme}_構成案_Midjourney.txt`;
       link.click();
       showToast('テキストファイルを保存しました');
     }
@@ -521,38 +553,31 @@
 ### 📱 SNS共通の目を引くキャッチコピー（フック）候補
 1. 「知らずに損してた…${theme}で成果が出る人と出ない人の決定的な差」
 2. 「【保存版】${theme}で挫折しないための完全ステップ」
-3. 「後輩に聞かずにこっそり始める！${theme}攻略法」
 
 ### 🐦 X (旧Twitter) 用投稿（140〜300文字）
 【${theme}で悩んでいる人へ】
 何から始めればいいか分からない…と立ち止まっていませんか？
-実は成功する人が最初にやっていることは、とてもシンプルです。
 つまずきやすい罠と、明日から使える解決策をnoteにまとめました！
 ▼記事はこちらから
 [記事URL]
-#${theme.replace(/\s+/g, '')} #note #ビジネス
+#${theme.replace(/\s+/g, '')} #note
 
-### 📸 Instagram用キャプション（共感・長文向け）
-「${theme}、挑戦したいけど難しそう…」
-そんな風に一人で悩んでいませんか？
+---
 
-実は、挫折してしまう最大の理由は「手順の順番」にあります。
-今回のnoteでは、初心者でも迷わず実践できる完全ロードマップを公開しました！
+## 6. note見出し画像用 Midjourney 生成プロンプト
 
-プロフィール欄のリンクからぜひチェックしてみてください✨
+・**画像ビジュアルコンセプト（日本語解説）:**
+タイトル文字を入れるスペース（中央または左側）にゆとりを持たせた、清潔感あふれるグリーン＆ゴールド基調のモダンなデザイン。知識のステップアップやロードマップを想起させるスマートな書斎・グラフィック表現。
 
-### 🧵 Threads用（カジュアル・140文字程度）
-${theme}について本音で書いたnoteを公開しました！
-「独学で挫折した」「何からやればいいか分からない」という方にこそ読んでほしい内容です。
-固くならずにサクッと読めるので、プロフィールのリンクから覗いてみてください👇
+・**Midjourney用 英語プロンプト パターン1（フラット・ミニマルイラスト風）:**
+\`\`\`text
+minimalist flat illustration of a professional business roadmap concept, clean green and white background with ample copy space for text, modern vector art, subtle gradient, high resolution, 8k --ar 16:9
+\`\`\`
 
-### 📘 Facebook用（丁寧・ビジネスコミュニティ向け）
-【note新着記事のご案内】
-「${theme}」をテーマに、実践的なロードマップとコピペで使える手順をまとめた記事を公開いたしました。
-
-「現状を変えたいけれど一歩が踏み出せない」と感じているビジネスパーソン向けに、失敗しないアプローチ方法を具体的に解説しています。
-
-関心のある方は、ぜひご一読いただければ幸いです。`;
+・**Midjourney用 英語プロンプト パターン2（3D・モダン・フォトリアル風）:**
+\`\`\`text
+3d glassmorphism icon representing future strategy and AI growth, soft lighting, pastel green and dark charcoal grey background, offset composition with blank space on the left for title text, sleek, octane render, 8k --ar 16:9
+\`\`\``;
     }
   </script>
 </body>
