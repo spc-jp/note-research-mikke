@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>note-research-mikke | note悩みリサーチ＆構成自動生成ツール</title>
+  <title>note-research-mikke | note悩みリサーチ＆売れる構成自動生成ツール</title>
   
-  <!-- Favicon (緑背景に白文字の「み」アイコン) -->
+  <!-- Favicon（ヘッダーロゴと共通の緑に「み」のロゴ） -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%2322c55e'/><text x='50' y='72' font-size='64' font-weight='bold' text-anchor='middle' fill='white' font-family='sans-serif'>み</text></svg>">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Marked.js for Markdown parsing -->
+  <!-- Marked.js (Markdownパーサー) -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <script>
@@ -111,7 +111,7 @@
         <div>
           <h1 class="text-base font-bold text-slate-900 leading-tight flex items-center gap-2">
             note-research-mikke
-            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v1.2</span>
+            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v1.3</span>
           </h1>
           <p class="text-xs text-slate-500">悩みリサーチ ＆ 売れる有料構成案メーカー</p>
         </div>
@@ -125,13 +125,53 @@
 
   <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
 
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
+    <div class="flex border-b border-slate-200 mb-6 gap-2">
+      <button id="tabResearch" onclick="switchTab('research')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-note-500 text-note-700 flex items-center gap-2 cursor-pointer transition">
+        <i class="fa-solid fa-fire text-amber-500"></i> 売れるテーマ ベスト3を発掘
+      </button>
+      <button id="tabOutline" onclick="switchTab('outline')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition">
+        <i class="fa-solid fa-wand-magic-sparkles text-note-500"></i> 構成案＆Midjourneyプロンプト生成
+      </button>
+    </div>
+
+    <!-- モード1: 売れるテーマ ベスト3発掘フォーム -->
+    <section id="sectionThemeFinder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
+      <h2 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
+        <i class="fa-solid fa-magnifying-glass-chart text-amber-500"></i> 大枠ジャンルからX/noteで売れるテーマBEST3を抽出
+      </h2>
+      <p class="text-xs text-slate-500 mb-5">AIや副業、ゴルフ、人間関係など、探したい「大枠のジャンル」を入力してください。</p>
+
+      <form id="themeFinderForm" onsubmit="handleThemeFinderSubmit(event)" class="space-y-4">
+        <div>
+          <label for="genre" class="block text-xs font-bold text-slate-700 mb-1.5">
+            大枠ジャンル・分野 <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="genre" 
+            required
+            placeholder="例: 生成AI活用、50代のキャリア、ゴルフ100切り、Instagram運用、副業" 
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-note-500 focus:border-transparent transition text-sm"
+          >
+        </div>
+
+        <button 
+          type="submit" 
+          id="finderBtn"
+          class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow-md transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
+        >
+          <i class="fa-solid fa-fire"></i> X & noteでバズる「売れるテーマBEST3」を分析抽出
+        </button>
+      </form>
+    </section>
+
+    <!-- モード2: 構成案作成フォーム -->
+    <section id="sectionOutlineBuilder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 hidden">
       <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-        <i class="fa-solid fa-magnifying-glass text-note-500"></i> リサーチ条件を設定
+        <i class="fa-solid fa-pen-ruler text-note-500"></i> リサーチ条件を設定して構成案を生成
       </h2>
 
       <form id="researchForm" onsubmit="handleFormSubmit(event)" class="space-y-5">
-        <!-- メインテーマ -->
         <div>
           <label for="theme" class="block text-xs font-bold text-slate-700 mb-1.5">
             メインテーマ <span class="text-rose-500">*</span>
@@ -140,13 +180,12 @@
             type="text" 
             id="theme" 
             required
-            placeholder="例: 50代からのキャリア再設計、ゴルフ 100切りの練習法、生成AI 副業" 
+            placeholder="例: 50代からのキャリア再設計、ゴルフ 100切りの練習法" 
             class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-note-500 focus:border-transparent transition text-sm"
           >
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <!-- ターゲット層 -->
           <div>
             <label for="target" class="block text-xs font-bold text-slate-700 mb-1.5">
               ターゲット層（任意）
@@ -159,7 +198,6 @@
             >
           </div>
 
-          <!-- 文体・トーン -->
           <div>
             <label for="tone" class="block text-xs font-bold text-slate-700 mb-1.5">
               文章のトーン
@@ -175,7 +213,6 @@
           </div>
         </div>
 
-        <!-- 生成ボタン -->
         <button 
           type="submit" 
           id="submitBtn"
@@ -188,25 +225,23 @@
 
     <div id="loadingArea" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm mb-8">
       <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-note-500 border-t-transparent mb-3"></div>
-      <p class="text-slate-800 font-bold text-base">悩みをディープリサーチ中...</p>
-      <p class="text-slate-500 text-xs mt-1">ターゲットのリアルな本音、売れる有料導線、Midjourney用プロンプトを構築中（20〜30秒）</p>
+      <p id="loadingTitle" class="text-slate-800 font-bold text-base">リサーチ分析中...</p>
+      <p id="loadingSubtitle" class="text-slate-500 text-xs mt-1">AIがデータを解析してアウトプットを構築しています（20〜30秒）</p>
     </div>
 
-    <!-- 生成結果出力エリア -->
     <section id="resultArea" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
-      <!-- アクションバー -->
       <div class="bg-slate-50 border-b border-slate-200 px-6 py-3 flex flex-wrap justify-between items-center gap-3">
-        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-file-lines text-note-600"></i> 生成結果（構成プロット）
+        <span id="resultHeaderTitle" class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-file-lines text-note-600"></i> 生成結果
         </span>
         <div class="flex items-center gap-2 flex-wrap">
           <button onclick="copyToClipboard()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
             <i class="fa-regular fa-copy"></i> 全文コピー
           </button>
-          <button onclick="copySnsToClipboard()" class="px-3 py-1.5 bg-note-50 border border-note-200 rounded-lg text-xs font-medium text-note-700 hover:bg-note-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
+          <button id="btnCopySns" onclick="copySnsToClipboard()" class="px-3 py-1.5 bg-note-50 border border-note-200 rounded-lg text-xs font-medium text-note-700 hover:bg-note-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
             <i class="fa-solid fa-share-nodes text-note-600"></i> SNS告知文コピー
           </button>
-          <button onclick="copyMidjourneyToClipboard()" class="px-3 py-1.5 bg-purple-50 border border-purple-200 rounded-lg text-xs font-medium text-purple-700 hover:bg-purple-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
+          <button id="btnCopyMj" onclick="copyMidjourneyToClipboard()" class="px-3 py-1.5 bg-purple-50 border border-purple-200 rounded-lg text-xs font-medium text-purple-700 hover:bg-purple-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
             <i class="fa-solid fa-image text-purple-600"></i> Midjourneyプロンプトコピー
           </button>
           <button onclick="downloadAsText()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
@@ -215,11 +250,11 @@
         </div>
       </div>
 
-      <!-- 生成された本文（Markdownプレビュー） -->
       <div id="resultContent" class="p-6 sm:p-8 prose max-w-none text-slate-800 text-sm sm:text-base leading-relaxed">
       </div>
     </section>
 
+    <!-- 履歴セクション -->
     <section id="historySection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hidden">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
@@ -228,12 +263,12 @@
         <button onclick="clearHistory()" class="text-xs text-rose-500 hover:underline cursor-pointer">履歴を全消去</button>
       </div>
       <div id="historyList" class="space-y-2">
-        <!-- JSで動的生成 -->
       </div>
     </section>
 
   </main>
 
+  <!-- 設定モーダル -->
   <div id="settingsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden px-4">
     <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200">
       <div class="flex justify-between items-center mb-4">
@@ -268,7 +303,6 @@
     </div>
   </div>
 
-  <!-- Toast 通知コンポーネント -->
   <div id="toast" class="fixed bottom-6 right-6 bg-slate-900/90 backdrop-blur-sm text-white px-4 py-3 rounded-xl shadow-xl text-xs font-medium translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50 flex items-center gap-2">
     <i id="toastIcon" class="fa-solid fa-circle-check text-note-500"></i>
     <span id="toastMsg">通知テキスト</span>
@@ -283,7 +317,6 @@
     const STORAGE_KEY_WORKER = 'mikke_worker_url';
     const STORAGE_KEY_HISTORY = 'mikke_research_history';
 
-    // 初期化処理
     document.addEventListener('DOMContentLoaded', () => {
       const savedWorkerUrl = localStorage.getItem(STORAGE_KEY_WORKER) || 'https://note-research-mikke.yymmatsu.workers.dev';
       document.getElementById('workerUrl').value = savedWorkerUrl;
@@ -291,7 +324,25 @@
       renderHistory();
     });
 
-    // カスタムToast通知表示機能
+    function switchTab(mode) {
+      const tabResearch = document.getElementById('tabResearch');
+      const tabOutline = document.getElementById('tabOutline');
+      const sectionFinder = document.getElementById('sectionThemeFinder');
+      const sectionOutline = document.getElementById('sectionOutlineBuilder');
+
+      if (mode === 'research') {
+        tabResearch.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-note-500 text-note-700 flex items-center gap-2 cursor-pointer transition';
+        tabOutline.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition';
+        sectionFinder.classList.remove('hidden');
+        sectionOutline.classList.add('hidden');
+      } else {
+        tabOutline.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-note-500 text-note-700 flex items-center gap-2 cursor-pointer transition';
+        tabResearch.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition';
+        sectionOutline.classList.remove('hidden');
+        sectionFinder.classList.add('hidden');
+      }
+    }
+
     function showToast(message, isError = false) {
       const toast = document.getElementById('toast');
       const toastMsg = document.getElementById('toastMsg');
@@ -313,13 +364,10 @@
       }, 3000);
     }
 
-    // モーダル切替
     function toggleSettingsModal() {
-      const modal = document.getElementById('settingsModal');
-      modal.classList.toggle('hidden');
+      document.getElementById('settingsModal').classList.toggle('hidden');
     }
 
-    // 設定保存
     function saveSettings() {
       const url = document.getElementById('workerUrl').value.trim();
       if (!url) {
@@ -331,10 +379,51 @@
       showToast('Worker URL設定を保存しました！');
     }
 
-    // フォーム送信ハンドラ
+    // モード1: テーマ発掘フォーム送信
+    async function handleThemeFinderSubmit(e) {
+      e.preventDefault();
+      const workerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
+      const genre = document.getElementById('genre').value.trim();
+
+      if (!genre) return;
+
+      document.getElementById('loadingTitle').textContent = '売れるテーマ BEST3を分析中...';
+      document.getElementById('loadingSubtitle').textContent = 'X(Twitter)やnoteのトレンド・需要をAIがディープリサーチ中（15〜25秒）';
+      document.getElementById('loadingArea').classList.remove('hidden');
+      document.getElementById('resultArea').classList.add('hidden');
+
+      try {
+        if (workerUrl) {
+          const response = await fetch(workerUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'find_themes', genre })
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'エラーが発生しました');
+          currentMarkdown = data.result;
+        }
+
+        document.getElementById('resultHeaderTitle').innerHTML = '<i class="fa-solid fa-fire text-amber-500"></i> 売れるテーマBEST3 抽出結果';
+        document.getElementById('btnCopySns').classList.add('hidden');
+        document.getElementById('btnCopyMj').classList.add('hidden');
+        document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
+        document.getElementById('resultArea').classList.remove('hidden');
+        document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+
+        saveToHistory(`[BEST3] ${genre}`, currentMarkdown);
+        showToast('売れるテーマBEST3の抽出が完了しました！');
+
+      } catch (err) {
+        showToast(`エラー: ${err.message}`, true);
+      } finally {
+        document.getElementById('loadingArea').classList.add('hidden');
+      }
+    }
+
+    // モード2: 構成案生成フォーム送信
     async function handleFormSubmit(e) {
       e.preventDefault();
-      
       const workerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
       const theme = document.getElementById('theme').value.trim();
       const target = document.getElementById('target').value.trim();
@@ -342,42 +431,30 @@
 
       if (!theme) return;
 
-      // UI状態の変更
+      document.getElementById('loadingTitle').textContent = '悩みをディープリサーチ中...';
+      document.getElementById('loadingSubtitle').textContent = 'ターゲットのリアルな本音、売れる有料導線、Midjourney用プロンプトを構築中（20〜30秒）';
       document.getElementById('loadingArea').classList.remove('hidden');
       document.getElementById('resultArea').classList.add('hidden');
-      document.getElementById('submitBtn').disabled = true;
-      document.getElementById('submitBtn').classList.add('opacity-50', 'cursor-not-allowed');
 
       try {
         if (workerUrl) {
-          // 本番Workerリクエスト
           const response = await fetch(workerUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ theme, target, tone })
+            body: JSON.stringify({ action: 'generate_outline', theme, target, tone })
           });
-
           const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'APIリクエスト中にエラーが発生しました。');
-          }
-
+          if (!response.ok) throw new Error(data.error || 'エラーが発生しました');
           currentMarkdown = data.result;
-        } else {
-          // テストフォールバック
-          await new Promise(resolve => setTimeout(resolve, 1500));
-          currentMarkdown = generateDemoMarkdown(theme, target, tone);
         }
 
-        // マークダウンの描画
+        document.getElementById('resultHeaderTitle').innerHTML = '<i class="fa-solid fa-file-lines text-note-600"></i> 生成結果（構成プロット）';
+        document.getElementById('btnCopySns').classList.remove('hidden');
+        document.getElementById('btnCopyMj').classList.remove('hidden');
         document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
         document.getElementById('resultArea').classList.remove('hidden');
-        
-        // 結果位置へスクロール
         document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
 
-        // 履歴保存
         saveToHistory(theme, currentMarkdown);
         showToast('構成案＆Midjourneyプロンプトの生成が完了しました！');
 
@@ -385,37 +462,24 @@
         showToast(`エラー: ${err.message}`, true);
       } finally {
         document.getElementById('loadingArea').classList.add('hidden');
-        document.getElementById('submitBtn').disabled = false;
-        document.getElementById('submitBtn').classList.remove('opacity-50', 'cursor-not-allowed');
       }
     }
 
-    // 全文コピー
     function copyToClipboard() {
       if (!currentMarkdown) return;
-      copyText(currentMarkdown, '構成案・SNS文章・Midjourneyプロンプト（全文）をコピーしました！');
+      copyText(currentMarkdown, '全文をコピーしました！');
     }
 
-    // SNS告知文のみコピー
     function copySnsToClipboard() {
       if (!currentMarkdown) return;
       const snsMatch = currentMarkdown.match(/## 5\.\s*4大SNS集客告知コピー[\s\S]*?(?=## 6\.|Text$|$)/i);
-      if (snsMatch) {
-        copyText(snsMatch[0], '4大SNS集客告知コピーを抽出コピーしました！');
-      } else {
-        copyText(currentMarkdown, '全文をコピーしました！');
-      }
+      copyText(snsMatch ? snsMatch[0] : currentMarkdown, '4大SNS集客告知コピーをコピーしました！');
     }
 
-    // Midjourneyプロンプトのみコピー
     function copyMidjourneyToClipboard() {
       if (!currentMarkdown) return;
       const mjMatch = currentMarkdown.match(/## 6\.\s*note見出し画像用 Midjourney 生成プロンプト[\s\S]*/i);
-      if (mjMatch) {
-        copyText(mjMatch[0], 'Midjourney用プロンプトを抽出コピーしました！');
-      } else {
-        copyText(currentMarkdown, '全文をコピーしました！');
-      }
+      copyText(mjMatch ? mjMatch[0] : currentMarkdown, 'Midjourney用プロンプトをコピーしました！');
     }
 
     function copyText(text, message) {
@@ -438,29 +502,21 @@
       }
     }
 
-    // テキスト保存
     function downloadAsText() {
       if (!currentMarkdown) return;
-      const theme = document.getElementById('theme').value.trim() || 'note_kousei';
+      const theme = document.getElementById('theme').value.trim() || 'note_research';
       const blob = new Blob([currentMarkdown], { type: 'text/plain;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `${theme}_構成案_Midjourney.txt`;
+      link.download = `${theme}_リサーチ結果.txt`;
       link.click();
       showToast('テキストファイルを保存しました');
     }
 
     function saveToHistory(theme, content) {
       let history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY) || '[]');
-      const newItem = {
-        id: Date.now(),
-        theme: theme,
-        date: new Date().toLocaleDateString('ja-JP'),
-        content: content
-      };
-      history.unshift(newItem);
+      history.unshift({ id: Date.now(), theme: theme, date: new Date().toLocaleDateString('ja-JP'), content: content });
       if (history.length > 5) history.pop();
-      
       localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
       renderHistory();
     }
@@ -494,11 +550,10 @@
       const item = history.find(h => h.id === id);
       if (item) {
         currentMarkdown = item.content;
-        document.getElementById('theme').value = item.theme;
         document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
         document.getElementById('resultArea').classList.remove('hidden');
         document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
-        showToast('過去の構成案を読み込みました');
+        showToast('履歴を読み込みました');
       }
     }
 
@@ -509,75 +564,7 @@
     }
 
     function escapeHtml(str) {
-      return str.replace(/[&<>"']/g, function(m) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-      });
-    }
-
-    function generateDemoMarkdown(theme, target, tone) {
-      return `## 1. 読者のペルソナとリアルな悩み
-・**ターゲットの状況:** ${target || '現状を打破したいと考えているビジネスパーソン'}
-・**抱えている切実な悩み（本音）:**
-  1. 「何から手をつければいいのか具体的に分からず立ち止まっている」
-  2. 「独学で試したものの、継続できず成果が出ない」
-  3. 「失敗して時間やお金を無駄にするのが怖い」
-・**検索意図・キーワード:** \`${theme} 悩み\`, \`${theme} 初心者 解決\`
-
----
-
-## 2. 無料記事の構成案（共感・理由・ロードマップ）
-・**タイトル案:**
-  1. 【保存版】${theme}で絶対につまずかないための完全ロードマップ
-  2. なぜ${theme}は挫折しやすいのか？知っておくべき共通の罠
-・**導入:** 悩みに寄り添い、「あなたの努力不足ではなく手順の問題である」と安心感を与える。
-・**本文:** 失敗する人の3つの共通点と、正しいアプローチの全体像を提示。
-
----
-
-## 3. 【有料切り替えの境界線】
-・**無料部分:** 「なぜそれが必要なのか（Why）」と「全体のロードマップ（What）」
-・**有料部分:** 「明日から使える具体的な実践手順（How）」と「テンプレート」
-・**誘導フレーズ:** *「ここまでは全体の考え方を解説しました。ここから先は、私が実際に成果を出した『具体的なステップと実践シート』を限定公開します。」*
-
----
-
-## 4. 有料記事の構成案（実践ノウハウ・特典）
-・**タイトル案:**
-  1. 【実践編】${theme}で結果を出すための具体手順＆完全チェックシート
-・**購入者特典:** 「そのまま使えるアクションプランシート（PDF/テンプレート）」
-
----
-
-## 5. 4大SNS集客告知コピー＆タイトル候補
-
-### 📱 SNS共通の目を引くキャッチコピー（フック）候補
-1. 「知らずに損してた…${theme}で成果が出る人と出ない人の決定的な差」
-2. 「【保存版】${theme}で挫折しないための完全ステップ」
-
-### 🐦 X (旧Twitter) 用投稿（140〜300文字）
-【${theme}で悩んでいる人へ】
-何から始めればいいか分からない…と立ち止まっていませんか？
-つまずきやすい罠と、明日から使える解決策をnoteにまとめました！
-▼記事はこちらから
-[記事URL]
-#${theme.replace(/\s+/g, '')} #note
-
----
-
-## 6. note見出し画像用 Midjourney 生成プロンプト
-
-・**画像ビジュアルコンセプト（日本語解説）:**
-タイトル文字を入れるスペース（中央または左側）にゆとりを持たせた、清潔感あふれるグリーン＆ゴールド基調のモダンなデザイン。知識のステップアップやロードマップを想起させるスマートな書斎・グラフィック表現。
-
-・**Midjourney用 英語プロンプト パターン1（フラット・ミニマルイラスト風）:**
-\`\`\`text
-minimalist flat illustration of a professional business roadmap concept, clean green and white background with ample copy space for text, modern vector art, subtle gradient, high resolution, 8k --ar 16:9
-\`\`\`
-
-・**Midjourney用 英語プロンプト パターン2（3D・モダン・フォトリアル風）:**
-\`\`\`text
-3d glassmorphism icon representing future strategy and AI growth, soft lighting, pastel green and dark charcoal grey background, offset composition with blank space on the left for title text, sleek, octane render, 8k --ar 16:9
-\`\`\``;
+      return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
     }
   </script>
 </body>
