@@ -573,7 +573,7 @@
 
     function copyMidjourneyToClipboard() {
       if (!currentMarkdown) return;
-      const mjMatch = currentMarkdown.match(/## 5\.\s*note見出し画像[\s\S]*/i);
+      const mjMatch = currentMarkdown.match(/## 5\.\s*note见出し画像[\s\S]*/i);
       copyText(mjMatch ? mjMatch[0] : currentMarkdown, 'Midjourney用サムネイルプロンプトをコピーしました！');
     }
 
