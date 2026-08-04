@@ -113,9 +113,9 @@
         <div>
           <h1 class="text-base font-bold text-slate-900 leading-tight flex items-center gap-2">
             note-research-mikke
-            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v1.5</span>
+            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v1.8</span>
           </h1>
-          <p class="text-xs text-slate-500">悩みリサーチ ＆ 売れる有料構成案メーカー</p>
+          <p class="text-xs text-slate-500">悩みリサーチ ＆ 売れる有料構成案・完全パッケージメーカー</p>
         </div>
       </div>
       <button onclick="toggleSettingsModal()" class="text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-xl hover:bg-slate-100 transition flex items-center gap-1.5 text-xs font-semibold border border-slate-200 cursor-pointer">
@@ -132,7 +132,7 @@
         <i class="fa-solid fa-fire text-amber-500"></i> 売れるテーマ ベスト3を発掘
       </button>
       <button id="tabOutline" onclick="switchTab('outline')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition">
-        <i class="fa-solid fa-wand-magic-sparkles text-note-500"></i> 構成案＆Midjourneyプロンプト生成
+        <i class="fa-solid fa-wand-magic-sparkles text-note-500"></i> 記事原稿・特典・SNS文一括生成
       </button>
     </div>
 
@@ -167,10 +167,10 @@
       </form>
     </section>
 
-    <!-- モード2: 構成案作成フォーム -->
+    <!-- モード2: 構成案・完成パッケージ作成フォーム -->
     <section id="sectionOutlineBuilder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 hidden">
       <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-        <i class="fa-solid fa-pen-ruler text-note-500"></i> リサーチ条件を設定して構成案を生成
+        <i class="fa-solid fa-pen-ruler text-note-500"></i> 条件を設定して完全コピペパッケージを生成
       </h2>
 
       <form id="researchForm" onsubmit="handleFormSubmit(event)" class="space-y-5">
@@ -220,34 +220,40 @@
           id="submitBtn"
           class="w-full bg-note-500 hover:bg-note-600 text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow-md transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
         >
-          <i class="fa-solid fa-wand-magic-sparkles"></i> 悩みをリサーチ＆無料・有料構成案・Midjourneyプロンプトを生成
+          <i class="fa-solid fa-wand-magic-sparkles"></i> 記事原稿・ハッシュタグ・特典原稿・SNS文を一括生成
         </button>
       </form>
     </section>
 
     <div id="loadingArea" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm mb-8">
       <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-note-500 border-t-transparent mb-3"></div>
-      <p id="loadingTitle" class="text-slate-800 font-bold text-base">リサーチ分析中...</p>
-      <p id="loadingSubtitle" class="text-slate-500 text-xs mt-1">AIがデータを解析してアウトプットを構築しています（20〜30秒）</p>
+      <p id="loadingTitle" class="text-slate-800 font-bold text-base">リサーチ＆パッケージ作成中...</p>
+      <p id="loadingSubtitle" class="text-slate-500 text-xs mt-1">記事原稿・ハッシュタグ・特典資料案・SNS文・サムネイルプロンプトを構築中（20〜30秒）</p>
     </div>
 
     <section id="resultArea" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
-      <div class="bg-slate-50 border-b border-slate-200 px-6 py-3 flex flex-wrap justify-between items-center gap-3">
+      <div class="bg-slate-50 border-b border-slate-200 px-6 py-3 flex flex-wrap justify-between items-center gap-2">
         <span id="resultHeaderTitle" class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-file-lines text-note-600"></i> 生成結果
+          <i class="fa-solid fa-file-lines text-note-600"></i> 生成結果（完全パッケージ）
         </span>
-        <div class="flex items-center gap-2 flex-wrap">
-          <button onclick="copyToClipboard()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-regular fa-copy"></i> 全文コピー
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button onclick="copyToClipboard()" class="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
+            <i class="fa-regular fa-copy"></i> 全文
           </button>
-          <button id="btnCopySns" onclick="copySnsToClipboard()" class="px-3 py-1.5 bg-note-50 border border-note-200 rounded-lg text-xs font-medium text-note-700 hover:bg-note-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-share-nodes text-note-600"></i> SNS告知文コピー
+          <button id="btnCopyHashtags" onclick="copyHashtagsToClipboard()" class="px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-xs font-medium text-amber-800 hover:bg-amber-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
+            <i class="fa-solid fa-hashtag text-amber-600"></i> ハッシュタグ
           </button>
-          <button id="btnCopyMj" onclick="copyMidjourneyToClipboard()" class="px-3 py-1.5 bg-purple-50 border border-purple-200 rounded-lg text-xs font-medium text-purple-700 hover:bg-purple-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-image text-purple-600"></i> Midjourneyプロンプトコピー
+          <button id="btnCopyArticle" onclick="copyArticleAndBonusToClipboard()" class="px-2.5 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-medium text-emerald-800 hover:bg-emerald-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
+            <i class="fa-solid fa-file-pen text-emerald-600"></i> 原稿＆特典
           </button>
-          <button onclick="downloadAsText()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-download"></i> TXT保存
+          <button id="btnCopySns" onclick="copySnsToClipboard()" class="px-2.5 py-1.5 bg-note-50 border border-note-200 rounded-lg text-xs font-medium text-note-700 hover:bg-note-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
+            <i class="fa-solid fa-share-nodes text-note-600"></i> SNS告知文
+          </button>
+          <button id="btnCopyMj" onclick="copyMidjourneyToClipboard()" class="px-2.5 py-1.5 bg-purple-50 border border-purple-200 rounded-lg text-xs font-medium text-purple-700 hover:bg-purple-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
+            <i class="fa-solid fa-image text-purple-600"></i> サムネプロンプト
+          </button>
+          <button onclick="downloadAsText()" class="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
+            <i class="fa-solid fa-download"></i> TXT
           </button>
         </div>
       </div>
@@ -417,11 +423,12 @@
         }
 
         document.getElementById('resultHeaderTitle').innerHTML = '<i class="fa-solid fa-fire text-amber-500"></i> 売れるテーマBEST3 抽出結果';
+        document.getElementById('btnCopyHashtags').classList.add('hidden');
+        document.getElementById('btnCopyArticle').classList.add('hidden');
         document.getElementById('btnCopySns').classList.add('hidden');
         document.getElementById('btnCopyMj').classList.add('hidden');
         document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
         
-        // ベスト3テーマのパース＆ワンクリック生成ボタン表示
         renderThemeActionButtons(currentMarkdown);
 
         document.getElementById('resultArea').classList.remove('hidden');
@@ -437,21 +444,17 @@
       }
     }
 
-    // ベスト3結果からタイトルとターゲットを抽出し、ワンクリックボタンを作成（正規表現の柔軟化）
     function renderThemeActionButtons(markdown) {
       const actionArea = document.getElementById('themeActionArea');
       const actionButtons = document.getElementById('themeActionButtons');
       actionButtons.innerHTML = '';
 
-      // ### 🥇 第1位: 【タイトル】 または 第1位: 【タイトル】 等に広くマッチ
       const matches = [...markdown.matchAll(/(?:###?\s*)?(?:🥇|🥈|🥉)?\s*第([123])位[:：]\s*【?(.*?)】?$/gm)];
       const targetMatches = [...markdown.matchAll(/・\*\*ターゲット読者:\*\*\s*(.*)$/gm)];
 
       if (matches.length > 0) {
         matches.forEach((match, index) => {
-          const rank = match[1];
           let rawTitle = match[2].replace(/[【】]/g, '').trim();
-          // 改行が入っている場合は1行目のみ取得
           if (rawTitle.includes('\n')) {
             rawTitle = rawTitle.split('\n')[0].trim();
           }
@@ -460,7 +463,7 @@
           const targetText = targetMatches[index] ? targetMatches[index][1].trim() : '';
 
           const btn = document.createElement('button');
-          btn.className = 'w-full bg-white border border-slate-300 hover:border-note-500 hover:bg-note-50 text-slate-800 p-3 rounded-xl transition text-left cursor-pointer flex flex-col justify-between shadow-xs group';
+          btn.className = 'w-full bg-white border border-slate-300 hover:border-note-500 hover:bg-note-50 text-slate-800 p-3.5 rounded-xl transition text-left cursor-pointer flex flex-col justify-between shadow-xs group';
           btn.onclick = () => applyThemeAndSwitch(rawTitle, targetText);
           btn.innerHTML = `
             <div>
@@ -468,7 +471,7 @@
               <p class="text-xs font-bold text-slate-900 group-hover:text-note-700 line-clamp-2 leading-snug">${escapeHtml(rawTitle)}</p>
             </div>
             <div class="mt-3 text-[11px] text-note-600 font-bold flex items-center justify-between border-t border-slate-100 pt-2">
-              <span>このテーマで構成案・SNS文章を作成</span>
+              <span>このテーマで構成案・特典・SNS文章を作成</span>
               <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </div>
           `;
@@ -480,7 +483,6 @@
       }
     }
 
-    // テーマ選択して構成案入力欄に自動適用＆自動送信
     function applyThemeAndSwitch(themeTitle, targetText) {
       document.getElementById('theme').value = themeTitle;
       if (targetText) {
@@ -501,8 +503,8 @@
 
       if (!theme) return;
 
-      document.getElementById('loadingTitle').textContent = '悩みをディープリサーチ中...';
-      document.getElementById('loadingSubtitle').textContent = 'ターゲットの本音、売れる有料導線、4大SNS文（Threads3連投含む）、Midjourneyプロンプトを構築中（20〜30秒）';
+      document.getElementById('loadingTitle').textContent = '完全パッケージを構築中...';
+      document.getElementById('loadingSubtitle').textContent = '記事原稿、ハッシュタグ、約10ページ相当の特典原稿、4大SNS文、Midjourneyプロンプトを生成中（20〜30秒）';
       document.getElementById('loadingArea').classList.remove('hidden');
       document.getElementById('resultArea').classList.add('hidden');
       document.getElementById('themeActionArea').classList.add('hidden');
@@ -519,7 +521,9 @@
           currentMarkdown = data.result;
         }
 
-        document.getElementById('resultHeaderTitle').innerHTML = '<i class="fa-solid fa-file-lines text-note-600"></i> 生成結果（構成プロット＆SNS文章）';
+        document.getElementById('resultHeaderTitle').innerHTML = '<i class="fa-solid fa-file-lines text-note-600"></i> 生成結果（完全コピペパッケージ）';
+        document.getElementById('btnCopyHashtags').classList.remove('hidden');
+        document.getElementById('btnCopyArticle').classList.remove('hidden');
         document.getElementById('btnCopySns').classList.remove('hidden');
         document.getElementById('btnCopyMj').classList.remove('hidden');
         document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
@@ -527,7 +531,7 @@
         document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
 
         saveToHistory(theme, currentMarkdown);
-        showToast('構成案＆SNS集客文＆Midjourneyプロンプトの生成が完了しました！');
+        showToast('原稿・ハッシュタグ・特典・SNS文・プロンプトの一括生成が完了しました！');
 
       } catch (err) {
         showToast(`エラー: ${err.message}`, true);
@@ -541,6 +545,23 @@
       copyText(currentMarkdown, '全文をコピーしました！');
     }
 
+    function copyHashtagsToClipboard() {
+      if (!currentMarkdown) return;
+      const match = currentMarkdown.match(/## 2\.\s*横並びおすすめハッシュタグ[\s\S]*?(?=## 3\.| $)/i);
+      if (match) {
+        const hashLines = match[0].split('\n').filter(line => line.includes('#')).join(' ');
+        copyText(hashLines || match[0], '横並びハッシュタグをコピーしました！');
+      } else {
+        copyText(currentMarkdown, 'ハッシュタグをコピーしました！');
+      }
+    }
+
+    function copyArticleAndBonusToClipboard() {
+      if (!currentMarkdown) return;
+      const match = currentMarkdown.match(/## 3\.\s*note記事原稿[\s\S]*?(?=## 5\.| $)/i);
+      copyText(match ? match[0] : currentMarkdown, 'note原稿＆特典原稿をコピーしました！');
+    }
+
     function copySnsToClipboard() {
       if (!currentMarkdown) return;
       const snsMatch = currentMarkdown.match(/## 5\.\s*4大SNS集客告知コピー[\s\S]*?(?=## 6\.|Text$|$)/i);
@@ -549,8 +570,8 @@
 
     function copyMidjourneyToClipboard() {
       if (!currentMarkdown) return;
-      const mjMatch = currentMarkdown.match(/## 6\.\s*note見出し画像用 Midjourney 生成プロンプト[\s\S]*/i);
-      copyText(mjMatch ? mjMatch[0] : currentMarkdown, 'Midjourney用プロンプトをコピーしました！');
+      const mjMatch = currentMarkdown.match(/## 6\.\s*note見出し画像[\s\S]*/i);
+      copyText(mjMatch ? mjMatch[0] : currentMarkdown, 'Midjourney用サムネイルプロンプトをコピーしました！');
     }
 
     function copyText(text, message) {
@@ -579,7 +600,7 @@
       const blob = new Blob([currentMarkdown], { type: 'text/plain;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `${theme}_リサーチ結果.txt`;
+      link.download = `${theme}_完成パッケージ.txt`;
       link.click();
       showToast('テキストファイルを保存しました');
     }
