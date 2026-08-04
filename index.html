@@ -111,7 +111,7 @@
         <div>
           <h1 class="text-base font-bold text-slate-900 leading-tight flex items-center gap-2">
             note-research-mikke
-            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v1.3</span>
+            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v1.4</span>
           </h1>
           <p class="text-xs text-slate-500">悩みリサーチ ＆ 売れる有料構成案メーカー</p>
         </div>
@@ -252,6 +252,15 @@
 
       <div id="resultContent" class="p-6 sm:p-8 prose max-w-none text-slate-800 text-sm sm:text-base leading-relaxed">
       </div>
+
+      <!-- ベスト3抽出結果からのワンクリック構成案移行ボタン群 -->
+      <div id="themeActionArea" class="hidden bg-slate-50 border-t border-slate-200 p-5">
+        <p class="text-xs font-bold text-slate-700 mb-3 flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-right-to-city text-note-600"></i> 気に入ったテーマを選んでワンクリックで有料構成案を作成:
+        </p>
+        <div id="themeActionButtons" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        </div>
+      </div>
     </section>
 
     <!-- 履歴セクション -->
@@ -314,6 +323,7 @@
 
   <script>
     let currentMarkdown = '';
+    let parsedBestThemes = [];
     const STORAGE_KEY_WORKER = 'mikke_worker_url';
     const STORAGE_KEY_HISTORY = 'mikke_research_history';
 
@@ -391,6 +401,7 @@
       document.getElementById('loadingSubtitle').textContent = 'X(Twitter)やnoteのトレンド・需要をAIがディープリサーチ中（15〜25秒）';
       document.getElementById('loadingArea').classList.remove('hidden');
       document.getElementById('resultArea').classList.add('hidden');
+      document.getElementById('themeActionArea').classList.add('hidden');
 
       try {
         if (workerUrl) {
@@ -408,6 +419,10 @@
         document.getElementById('btnCopySns').classList.add('hidden');
         document.getElementById('btnCopyMj').classList.add('hidden');
         document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
+        
+        // ベスト3テーマのパース＆ワンクリック生成ボタン表示
+        renderThemeActionButtons(currentMarkdown);
+
         document.getElementById('resultArea').classList.remove('hidden');
         document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
 
@@ -419,6 +434,53 @@
       } finally {
         document.getElementById('loadingArea').classList.add('hidden');
       }
+    }
+
+    // ベスト3結果からタイトルとターゲットを抽出し、ワンクリックボタンを作成
+    function renderThemeActionButtons(markdown) {
+      const actionArea = document.getElementById('themeActionArea');
+      const actionButtons = document.getElementById('themeActionButtons');
+      actionButtons.innerHTML = '';
+
+      const matches = [...markdown.matchAll(/###\s*(🥇|🥈|🥉)?\s*第([123])位[:：]\s*【?(.*?)】?$/gm)];
+      const targetMatches = [...markdown.matchAll(/・\*\*ターゲット読者:\*\*\s*(.*)$/gm)];
+
+      if (matches.length > 0) {
+        matches.forEach((match, index) => {
+          const rank = match[2];
+          const rawTitle = match[3].replace(/[【】]/g, '').trim();
+          const badge = index === 0 ? '🥇 1位' : index === 1 ? '🥈 2位' : '🥉 3位';
+          const targetText = targetMatches[index] ? targetMatches[index][1].trim() : '';
+
+          const btn = document.createElement('button');
+          btn.className = 'w-full bg-white border border-slate-300 hover:border-note-500 hover:bg-note-50 text-slate-800 p-3 rounded-xl transition text-left cursor-pointer flex flex-col justify-between shadow-xs group';
+          btn.onclick = () => applyThemeAndSwitch(rawTitle, targetText);
+          btn.innerHTML = `
+            <div>
+              <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 mb-1">${badge}のテーマ</span>
+              <p class="text-xs font-bold text-slate-900 group-hover:text-note-700 line-clamp-2">${escapeHtml(rawTitle)}</p>
+            </div>
+            <div class="mt-2 text-[11px] text-note-600 font-semibold flex items-center gap-1">
+              このテーマで構成案を作成 <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </div>
+          `;
+          actionButtons.appendChild(btn);
+        });
+        actionArea.classList.remove('hidden');
+      } else {
+        actionArea.classList.add('hidden');
+      }
+    }
+
+    // テーマ選択して構成案入力欄に自動適用＆タブ切り替え
+    function applyThemeAndSwitch(themeTitle, targetText) {
+      document.getElementById('theme').value = themeTitle;
+      if (targetText) {
+        document.getElementById('target').value = targetText;
+      }
+      switchTab('outline');
+      document.getElementById('sectionOutlineBuilder').scrollIntoView({ behavior: 'smooth' });
+      showToast(`「${themeTitle.substring(0, 15)}...」を構成案フォームにセットしました！`);
     }
 
     // モード2: 構成案生成フォーム送信
@@ -435,6 +497,7 @@
       document.getElementById('loadingSubtitle').textContent = 'ターゲットのリアルな本音、売れる有料導線、Midjourney用プロンプトを構築中（20〜30秒）';
       document.getElementById('loadingArea').classList.remove('hidden');
       document.getElementById('resultArea').classList.add('hidden');
+      document.getElementById('themeActionArea').classList.add('hidden');
 
       try {
         if (workerUrl) {
@@ -551,6 +614,7 @@
       if (item) {
         currentMarkdown = item.content;
         document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
+        document.getElementById('themeActionArea').classList.add('hidden');
         document.getElementById('resultArea').classList.remove('hidden');
         document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
         showToast('履歴を読み込みました');
