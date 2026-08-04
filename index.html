@@ -244,7 +244,7 @@
             <i class="fa-solid fa-hashtag text-amber-600"></i> ハッシュタグ
           </button>
           <button id="btnCopyArticle" onclick="copyArticleAndBonusToClipboard()" class="px-2.5 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-medium text-emerald-800 hover:bg-emerald-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-file-pen text-emerald-600"></i> 原稿＆特典
+            <i class="fa-solid fa-file-pen text-emerald-600"></i> 原稿＆Word特典
           </button>
           <button id="btnCopySns" onclick="copySnsToClipboard()" class="px-2.5 py-1.5 bg-note-50 border border-note-200 rounded-lg text-xs font-medium text-note-700 hover:bg-note-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
             <i class="fa-solid fa-share-nodes text-note-600"></i> SNS告知文
@@ -504,7 +504,7 @@
       if (!theme) return;
 
       document.getElementById('loadingTitle').textContent = '完全パッケージを構築中...';
-      document.getElementById('loadingSubtitle').textContent = '記事原稿、ハッシュタグ、約10ページ相当の特典原稿、4大SNS文、Midjourneyプロンプトを生成中（20〜30秒）';
+      document.getElementById('loadingSubtitle').textContent = '記事原稿、ハッシュタグ、Word目次対応の特典原稿、4大SNS文、Midjourneyプロンプトを生成中（20〜30秒）';
       document.getElementById('loadingArea').classList.remove('hidden');
       document.getElementById('resultArea').classList.add('hidden');
       document.getElementById('themeActionArea').classList.add('hidden');
@@ -531,7 +531,7 @@
         document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
 
         saveToHistory(theme, currentMarkdown);
-        showToast('原稿・ハッシュタグ・特典・SNS文・プロンプトの一括生成が完了しました！');
+        showToast('原稿・Word対応特典・SNS文・プロンプトの一括生成が完了しました！');
 
       } catch (err) {
         showToast(`エラー: ${err.message}`, true);
@@ -547,10 +547,10 @@
 
     function copyHashtagsToClipboard() {
       if (!currentMarkdown) return;
-      const match = currentMarkdown.match(/## 2\.\s*横並びおすすめハッシュタグ[\s\S]*?(?=## 3\.| $)/i);
-      if (match) {
-        const hashLines = match[0].split('\n').filter(line => line.includes('#')).join(' ');
-        copyText(hashLines || match[0], '横並びハッシュタグをコピーしました！');
+      const match = currentMarkdown.match(/#[\w\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]+/g);
+      if (match && match.length > 0) {
+        const hashText = match.slice(0, 5).join(' ');
+        copyText(hashText, 'ハッシュタグ（5選）をコピーしました！');
       } else {
         copyText(currentMarkdown, 'ハッシュタグをコピーしました！');
       }
@@ -558,19 +558,19 @@
 
     function copyArticleAndBonusToClipboard() {
       if (!currentMarkdown) return;
-      const match = currentMarkdown.match(/## 3\.\s*note記事原稿[\s\S]*?(?=## 5\.| $)/i);
-      copyText(match ? match[0] : currentMarkdown, 'note原稿＆特典原稿をコピーしました！');
+      const match = currentMarkdown.match(/## 2\.\s*note記事原稿[\s\S]*?(?=## 4\.| $)/i);
+      copyText(match ? match[0] : currentMarkdown, 'note原稿＆Word目次対応特典をコピーしました！');
     }
 
     function copySnsToClipboard() {
       if (!currentMarkdown) return;
-      const snsMatch = currentMarkdown.match(/## 5\.\s*4大SNS集客告知コピー[\s\S]*?(?=## 6\.|Text$|$)/i);
+      const snsMatch = currentMarkdown.match(/## 4\.\s*4大SNS集客告知コピー[\s\S]*?(?=## 5\.|Text$|$)/i);
       copyText(snsMatch ? snsMatch[0] : currentMarkdown, '4大SNS集客告知コピー（Threads 3連投含む）をコピーしました！');
     }
 
     function copyMidjourneyToClipboard() {
       if (!currentMarkdown) return;
-      const mjMatch = currentMarkdown.match(/## 6\.\s*note見出し画像[\s\S]*/i);
+      const mjMatch = currentMarkdown.match(/## 5\.\s*note見出し画像[\s\S]*/i);
       copyText(mjMatch ? mjMatch[0] : currentMarkdown, 'Midjourney用サムネイルプロンプトをコピーしました！');
     }
 
