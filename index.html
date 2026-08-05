@@ -5,14 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>note-research-mikke | note悩みリサーチ＆売れる構成自動生成ツール</title>
   
-  <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%2322c55e'/><text x='50' y='72' font-size='64' font-weight='bold' text-anchor='middle' fill='white' font-family='sans-serif'>み</text></svg>">
 
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS & Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Marked.js (Markdownパーサー) -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <script>
@@ -95,11 +92,6 @@
       color: inherit;
       padding: 0;
     }
-    .prose hr {
-      border: 0;
-      border-top: 1px dashed #cbd5e1;
-      margin: 1.5rem 0;
-    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased relative">
@@ -113,7 +105,7 @@
         <div>
           <h1 class="text-base font-bold text-slate-900 leading-tight flex items-center gap-2">
             note-research-mikke
-            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v2.2</span>
+            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v2.5</span>
           </h1>
           <p class="text-xs text-slate-500">悩みリサーチ ＆ 売れる有料構成案・完全パッケージメーカー</p>
         </div>
@@ -127,16 +119,17 @@
 
   <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
 
+    <!-- STEP切替タブ -->
     <div class="flex border-b border-slate-200 mb-6 gap-2 overflow-x-auto">
       <button id="tabResearch" onclick="switchTab('research')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-note-500 text-note-700 flex items-center gap-2 cursor-pointer transition shrink-0">
-        <i class="fa-solid fa-bullseye text-amber-500"></i> STEP 1: リサーチ（悩み / テーマ）
+        <i class="fa-solid fa-bullseye text-amber-500"></i> STEP 1: ターゲット悩みリサーチ
       </button>
       <button id="tabOutline" onclick="switchTab('outline')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition shrink-0">
-        <i class="fa-solid fa-wand-magic-sparkles text-note-500"></i> STEP 2: 記事原稿・特典・SNS一括生成
+        <i class="fa-solid fa-wand-magic-sparkles text-note-500"></i> STEP 2: 原稿・特典・動画プロンプト一括生成
       </button>
     </div>
 
-    <!-- モード1: ターゲット悩み / テーマリサーチフォーム（デフォルト表示） -->
+    <!-- STEP 1: リサーチフォーム -->
     <section id="sectionThemeFinder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
       <div class="flex items-center justify-between mb-2">
         <h2 id="researchTitle" class="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -145,7 +138,6 @@
       </div>
       <p id="researchSubtitle" class="text-xs text-slate-500 mb-4">読者のペルソナ（ターゲット層）を入力すると、その人が夜も眠れないほど悩んでいるリアルな本音をAIが抽出します。</p>
 
-      <!-- 入力モード切替 -->
       <div class="flex gap-4 mb-5 p-2.5 bg-amber-50/60 rounded-xl border border-amber-200/80 text-xs font-bold text-slate-700">
         <label class="flex items-center gap-1.5 cursor-pointer hover:text-note-700">
           <input type="radio" name="researchType" value="target" checked onchange="toggleResearchInput()" class="accent-note-500">
@@ -192,14 +184,43 @@
       </form>
     </section>
 
-    <!-- モード2: 構成案・完成パッケージ作成フォーム -->
+    <!-- STEP 2: 原稿・パッケージ一括生成フォーム -->
     <section id="sectionOutlineBuilder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 hidden">
       <h2 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
         <i class="fa-solid fa-pen-ruler text-note-500"></i> 条件を確認して完全コピペパッケージを一括生成
       </h2>
-      <p class="text-xs text-slate-500 mb-5">「誰に」「どんな悩み」「読後のベネフィット」を盛り込み、タイトル案・導入文・原稿・Word対応特典・4大SNS文・コミック風画像プロンプトを作成します。</p>
+      <p class="text-xs text-slate-500 mb-5">「誰に」「どんな悩み」「読後のベネフィット」を盛り込み、原稿・SNS文・画像＆動画プロンプトを一括生成します。</p>
 
       <form id="researchForm" onsubmit="handleFormSubmit(event)" class="space-y-5">
+        
+        <!-- 販売パッケージ形式の選択 -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">
+            販売パッケージ形式（特典資料の有無） <span class="text-rose-500">*</span>
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label class="border border-slate-300 rounded-xl p-3.5 flex items-start gap-2.5 cursor-pointer hover:border-note-500 hover:bg-note-50/50 transition has-[:checked]:border-note-500 has-[:checked]:bg-note-50/60 has-[:checked]:ring-1 has-[:checked]:ring-note-500">
+              <input type="radio" name="packageType" value="full_package" checked class="mt-0.5 accent-note-500">
+              <div>
+                <p class="text-xs font-bold text-slate-900 flex items-center gap-1">
+                  🎁 フルパッケージ <span class="text-[10px] bg-note-100 text-note-700 px-1.5 py-0.2 rounded font-medium">おすすめ</span>
+                </p>
+                <p class="text-[11px] text-slate-500 mt-0.5">記事原稿 ＋ <strong>Word/PDF特典資料（10P相当）</strong> ＋ SNS ＋ 画像/動画プロンプト（高単価販売向け）</p>
+              </div>
+            </label>
+
+            <label class="border border-slate-300 rounded-xl p-3.5 flex items-start gap-2.5 cursor-pointer hover:border-note-500 hover:bg-note-50/50 transition has-[:checked]:border-note-500 has-[:checked]:bg-note-50/60 has-[:checked]:ring-1 has-[:checked]:ring-note-500">
+              <input type="radio" name="packageType" value="article_only" class="mt-0.5 accent-note-500">
+              <div>
+                <p class="text-xs font-bold text-slate-900 flex items-center gap-1">
+                  📄 記事のみ（爆速生成）
+                </p>
+                <p class="text-[11px] text-slate-500 mt-0.5">無料〜有料記事本文 ＋ SNS ＋ 画像/動画プロンプト（特典なし・手軽な低〜中価格販売向け）</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
         <div>
           <label for="theme" class="block text-xs font-bold text-slate-700 mb-1.5">
             メインテーマ（解決したい悩み・企画名） <span class="text-rose-500">*</span>
@@ -249,7 +270,7 @@
           id="submitBtn"
           class="w-full bg-note-500 hover:bg-note-600 text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow-md transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
         >
-          <i class="fa-solid fa-wand-magic-sparkles"></i> 磨き上げた原稿・Word対応特典・4大SNS文を一括生成
+          <i class="fa-solid fa-wand-magic-sparkles"></i> 磨き上げた原稿・SNS文・動画プロンプトを一括生成
         </button>
       </form>
     </section>
@@ -258,7 +279,7 @@
     <div id="loadingArea" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm mb-8">
       <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-note-500 border-t-transparent mb-3"></div>
       <p id="loadingTitle" class="text-slate-800 font-bold text-base">リサーチ＆パッケージ作成中...</p>
-      <p id="loadingSubtitle" class="text-slate-500 text-xs mt-1">「誰に」「悩み」「読後のベネフィット」を盛り込み、プロ品質で執筆中（20〜30秒）</p>
+      <p id="loadingSubtitle" class="text-slate-500 text-xs mt-1">プロ品質で執筆中（15〜30秒）</p>
     </div>
 
     <!-- 結果エリア -->
@@ -283,6 +304,9 @@
           <button id="btnCopyMj" onclick="copyMidjourneyToClipboard()" class="px-2.5 py-1.5 bg-purple-50 border border-purple-200 rounded-lg text-xs font-medium text-purple-700 hover:bg-purple-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
             <i class="fa-solid fa-image text-purple-600"></i> サムネプロンプト
           </button>
+          <button id="btnCopyVideo" onclick="copyVideoToClipboard()" class="px-2.5 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-xs font-medium text-blue-700 hover:bg-blue-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
+            <i class="fa-solid fa-video text-blue-600"></i> 🎬 動画プロンプト
+          </button>
           <button onclick="downloadAsText()" class="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
             <i class="fa-solid fa-download"></i> TXT
           </button>
@@ -292,10 +316,10 @@
       <div id="resultContent" class="p-6 sm:p-8 prose max-w-none text-slate-800 text-sm sm:text-base leading-relaxed">
       </div>
 
-      <!-- リサーチ結果からのワンクリック移行ボタン群 -->
+      <!-- ワンクリック移行ボタン群 -->
       <div id="themeActionArea" class="hidden bg-amber-50/50 border-t border-amber-200 p-5">
         <p class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5">
-          <i class="fa-solid fa-circle-arrow-right text-amber-600"></i> 抽出された項目を選んで、そのまま原稿・Word特典・SNS文を作成:
+          <i class="fa-solid fa-circle-arrow-right text-amber-600"></i> 抽出された悩みを選んで、そのまま原稿・SNS文・動画プロンプトを作成:
         </p>
         <div id="themeActionButtons" class="grid grid-cols-1 md:grid-cols-3 gap-3">
         </div>
@@ -339,7 +363,7 @@
             placeholder="https://note-research-mikke.yymmatsu.workers.dev" 
             class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-note-500 focus:outline-none"
           >
-          <p class="text-[11px] text-slate-500 mt-1">作成した Cloudflare Worker の Endpoint URL を設定します。</p>
+          <p class="text-[11px] text-slate-500 mt-1">Cloudflare Worker の Endpoint URL を設定します。</p>
         </div>
       </div>
 
@@ -497,6 +521,7 @@
         document.getElementById('btnCopyArticle').classList.add('hidden');
         document.getElementById('btnCopySns').classList.add('hidden');
         document.getElementById('btnCopyMj').classList.add('hidden');
+        document.getElementById('btnCopyVideo').classList.add('hidden');
         document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
         
         renderThemeActionButtons(currentMarkdown, researchType === 'target' ? targetInput : genre);
@@ -541,7 +566,7 @@
               <p class="text-xs font-bold text-slate-900 group-hover:text-note-700 line-clamp-2 leading-snug">${escapeHtml(rawTitle)}</p>
             </div>
             <div class="mt-3 text-[11px] text-note-600 font-bold flex items-center justify-between border-t border-slate-100 pt-2">
-              <span>この内容で原稿＆特典を作成</span>
+              <span>この内容で原稿＆動画プロンプトを作成</span>
               <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </div>
           `;
@@ -569,11 +594,14 @@
       const theme = document.getElementById('theme').value.trim();
       const target = document.getElementById('target').value.trim();
       const tone = document.getElementById('tone').value;
+      const packageType = document.querySelector('input[name="packageType"]:checked').value;
 
       if (!theme) return;
 
       document.getElementById('loadingTitle').textContent = '完全パッケージを構築中...';
-      document.getElementById('loadingSubtitle').textContent = '「誰に」「悩み」「読後のベネフィット」を盛り込み、タイトル・導入文・原稿・特典・SNS文を生成中（20〜30秒）';
+      document.getElementById('loadingSubtitle').textContent = packageType === 'article_only' 
+        ? '原稿・SNS文・動画プロンプトを高速生成中（10〜15秒）' 
+        : '原稿・Word特典・SNS文・動画プロンプトを生成中（20〜30秒）';
       document.getElementById('loadingArea').classList.remove('hidden');
       document.getElementById('resultArea').classList.add('hidden');
       document.getElementById('themeActionArea').classList.add('hidden');
@@ -583,7 +611,7 @@
           const response = await fetch(workerUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'generate_outline', theme, target, tone })
+            body: JSON.stringify({ action: 'generate_outline', theme, target, tone, packageType })
           });
           const data = await response.json();
           if (!response.ok) throw new Error(data.error || 'エラーが発生しました');
@@ -595,12 +623,13 @@
         document.getElementById('btnCopyArticle').classList.remove('hidden');
         document.getElementById('btnCopySns').classList.remove('hidden');
         document.getElementById('btnCopyMj').classList.remove('hidden');
+        document.getElementById('btnCopyVideo').classList.remove('hidden');
         document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
         document.getElementById('resultArea').classList.remove('hidden');
         document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
 
         saveToHistory(theme, currentMarkdown);
-        showToast('磨き上げた原稿・Word対応特典・SNS文の一括生成が完了しました！');
+        showToast('生成が完了しました！');
 
       } catch (err) {
         showToast(`エラー: ${err.message}`, true);
@@ -627,20 +656,26 @@
 
     function copyArticleAndBonusToClipboard() {
       if (!currentMarkdown) return;
-      const match = currentMarkdown.match(/## 2\.\s*note記事原稿[\s\S]*?(?=## 4\.| $)/i);
-      copyText(match ? match[0] : currentMarkdown, 'note原稿＆Word目次対応特典をコピーしました！');
+      const match = currentMarkdown.match(/## 2\.\s*note記事原稿[\s\S]*?(?=## 3\.|## 4\.| $)/i);
+      copyText(match ? match[0] : currentMarkdown, 'note原稿をコピーしました！');
     }
 
     function copySnsToClipboard() {
       if (!currentMarkdown) return;
-      const snsMatch = currentMarkdown.match(/## 4\.\s*4大SNS集客告知コピー[\s\S]*?(?=## 5\.|Text$|$)/i);
-      copyText(snsMatch ? snsMatch[0] : currentMarkdown, '4大SNS集客告知コピー（Threads 3連投含む）をコピーしました！');
+      const snsMatch = currentMarkdown.match(/## (?:3|4)\.\s*4大SNS集客告知コピー[\s\S]*?(?=## (?:4|5)\.|Text$|$)/i);
+      copyText(snsMatch ? snsMatch[0] : currentMarkdown, '4大SNS集客告知コピーをコピーしました！');
     }
 
     function copyMidjourneyToClipboard() {
       if (!currentMarkdown) return;
-      const mjMatch = currentMarkdown.match(/## 5\.\s*note見出し画像[\s\S]*/i);
+      const mjMatch = currentMarkdown.match(/## (?:4|5)\.\s*note見出し画像[\s\S]*?(?=## (?:5|6)\.| $)/i);
       copyText(mjMatch ? mjMatch[0] : currentMarkdown, 'Midjourney用サムネイルプロンプトをコピーしました！');
+    }
+
+    function copyVideoToClipboard() {
+      if (!currentMarkdown) return;
+      const videoMatch = currentMarkdown.match(/## (?:5|6)\.\s*Flow \/ Veo 3\.1対応[\s\S]*/i);
+      copyText(videoMatch ? videoMatch[0] : currentMarkdown, '🎬 32秒ショート動画プロンプト・構成一式をコピーしました！');
     }
 
     function copyText(text, message) {
@@ -668,7 +703,7 @@
       const theme = document.getElementById('theme').value.trim() || 'note_research';
       const blob = new Blob([currentMarkdown], { type: 'text/plain;charset=utf-8' });
       const link = document.createElement('a');
-      link.href = URL.center || URL.createObjectURL(blob);
+      link.href = URL.createObjectURL(blob);
       link.download = `${theme}_完成パッケージ.txt`;
       link.click();
       showToast('テキストファイルを保存しました');
