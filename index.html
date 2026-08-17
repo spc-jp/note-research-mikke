@@ -7,7 +7,7 @@
   
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%2322c55e'/><text x='50' y='72' font-size='64' font-weight='bold' text-anchor='middle' fill='white' font-family='sans-serif'>み</text></svg>">
 
-  <!-- Tailwind CSS & Icons & Marked.js -->
+  <!-- Tailwind CSS & Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -99,16 +99,23 @@
   <!-- Header -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
     <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 rounded-xl bg-note-500 text-white flex items-center justify-center font-bold text-xl shadow-sm">
+      <!-- 1クリックでトップ戻り / 2クリックでリセット（最初から） -->
+      <div 
+        id="headerLogoTitle" 
+        onclick="handleHeaderClick()" 
+        ondblclick="handleHeaderDblClick()" 
+        title="1クリック: 画面トップに戻る / 2クリック: 最初からスタート（リセット）"
+        class="flex items-center space-x-3 cursor-pointer select-none group hover:opacity-90 transition p-1 rounded-xl"
+      >
+        <div class="w-9 h-9 rounded-xl bg-note-500 text-white flex items-center justify-center font-bold text-xl shadow-sm group-hover:scale-105 transition-transform duration-200">
           み
         </div>
         <div>
           <h1 class="text-base font-bold text-slate-900 leading-tight flex items-center gap-2">
             note-research-mikke
-            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v4.1</span>
+            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v4.2</span>
           </h1>
-          <p class="text-xs text-slate-500">HARM法則 ＆ 全5話マガジンロードマップ・目次自由編集ツール</p>
+          <p class="text-xs text-slate-500 group-hover:text-note-600 transition-colors">HARM法則 ＆ 全5話マガジンロードマップ・目次自由編集ツール</p>
         </div>
       </div>
       <button onclick="toggleSettingsModal()" class="text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-xl hover:bg-slate-100 transition flex items-center gap-1.5 text-xs font-semibold border border-slate-200 cursor-pointer">
@@ -458,6 +465,7 @@
   <!-- JavaScript Logic -->
   <script>
     let currentMarkdown = '';
+    let clickTimer = null;
     const STORAGE_KEY_WORKER = 'mikke_worker_url';
     const STORAGE_KEY_HISTORY = 'mikke_research_history';
 
@@ -467,6 +475,43 @@
       localStorage.setItem(STORAGE_KEY_WORKER, savedWorkerUrl);
       renderHistory();
     });
+
+    // 1クリック（シングルクリック）: 画面最上部（トップ）へスクロール
+    function handleHeaderClick() {
+      if (clickTimer) clearTimeout(clickTimer);
+      clickTimer = setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast('画面トップへ移動しました');
+      }, 250);
+    }
+
+    // 2クリック（ダブルクリック）: 最初からスタート（初期状態にリセット）
+    function handleHeaderDblClick() {
+      if (clickTimer) {
+        clearTimeout(clickTimer);
+        clickTimer = null;
+      }
+      
+      // 入力フォームクリア
+      document.getElementById('targetInput').value = '';
+      document.getElementById('genre').value = '';
+      document.getElementById('seriesTheme').value = '';
+      document.getElementById('seriesTarget').value = '';
+      document.getElementById('theme').value = '';
+      document.getElementById('target').value = '';
+      document.getElementById('tocEditor').value = '';
+
+      // 表示セクション非表示
+      document.getElementById('tocEditorContainer').classList.add('hidden');
+      document.getElementById('resultArea').classList.add('hidden');
+      document.getElementById('themeActionArea').classList.add('hidden');
+      currentMarkdown = '';
+
+      // STEP 1 タブに戻す
+      switchTab('research');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast('最初からスタート（初期状態にリセット）しました！');
+    }
 
     function toggleResearchInput() {
       const researchType = document.querySelector('input[name="researchType"]:checked').value;
@@ -878,7 +923,6 @@
 
     function copyArticleAndBonusToClipboard() {
       if (!currentMarkdown) return;
-      // 2. note記事原稿から SNS告知セクションの前までを柔軟に抽出
       const match = currentMarkdown.match(/(?:#+\s*2\.\s*note記事原稿|##\s*2\.)[\s\S]*?(?=#+\s*(?:3\.|4\.|5\.)?\s*4大SNS|#+\s*4大SNS|#+\s*note見出し画像|$)/i);
       if (match && match[0].trim()) {
         copyText(match[0].trim(), 'note原稿（＋Word特典）をコピーしました！');
@@ -964,7 +1008,6 @@
       const textarea = document.createElement('textarea');
       textarea.value = text;
       
-      // 画面内（ビューポート内）かつ透明で配置し、execCommand('copy')の失敗を回避
       textarea.style.position = 'fixed';
       textarea.style.top = '0';
       textarea.style.left = '0';
