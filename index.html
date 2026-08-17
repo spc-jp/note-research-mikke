@@ -7,7 +7,7 @@
   
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%2322c55e'/><text x='50' y='72' font-size='64' font-weight='bold' text-anchor='middle' fill='white' font-family='sans-serif'>み</text></svg>">
 
-  <!-- Tailwind CSS & Icons -->
+  <!-- Tailwind CSS & FontAwesome Icons & Marked.js -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -96,7 +96,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased relative">
 
-  <!-- Header -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
     <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center space-x-3">
@@ -120,7 +119,6 @@
 
   <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
 
-    <!-- STEP切替ナビゲーション -->
     <div class="flex border-b border-slate-200 mb-6 gap-2 overflow-x-auto">
       <button id="tabResearch" onclick="switchTab('research')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-note-500 text-note-700 flex items-center gap-2 cursor-pointer transition shrink-0">
         <i class="fa-solid fa-bullseye text-amber-500"></i> STEP 1: HARM悩みリサーチ
@@ -133,7 +131,6 @@
       </button>
     </div>
 
-    <!-- STEP 1: リサーチフォーム -->
     <section id="sectionThemeFinder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
       <div class="flex items-center justify-between mb-2">
         <h2 id="researchTitle" class="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -188,7 +185,6 @@
       </form>
     </section>
 
-    <!-- STEP 2: 目次案生成 ＆ 自由編集フォーム -->
     <section id="sectionTocBuilder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 hidden">
       <h2 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
         <i class="fa-solid fa-list-check text-blue-500"></i> 条件を設定して「目次案（章立て）」をAI提案 ＆ 自由修正
@@ -272,7 +268,6 @@
         </button>
       </form>
 
-      <!-- 目次編集エリア（生成後に表示） -->
       <div id="tocEditorContainer" class="hidden border-t border-slate-200 pt-5 mt-5">
         <label for="tocEditor" class="block text-xs font-bold text-slate-800 mb-1 flex items-center justify-between">
           <span><i class="fa-solid fa-pen-to-square text-note-600"></i> 目次構成案（自由に加筆・修正・項目の入れ替えが可能です）:</span>
@@ -294,17 +289,14 @@
       </div>
     </section>
 
-    <!-- STEP 3: 本文・パッケージ確認 ＆ 出力エリア -->
     <section id="sectionOutlineBuilder" class="hidden"></section>
 
-    <!-- ローディングエリア -->
     <div id="loadingArea" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm mb-8">
       <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-note-500 border-t-transparent mb-3"></div>
       <p id="loadingTitle" class="text-slate-800 font-bold text-base">処理中...</p>
       <p id="loadingSubtitle" class="text-slate-500 text-xs mt-1">プロ品質で執筆中（15〜30秒）</p>
     </div>
 
-    <!-- 結果表示エリア -->
     <section id="resultArea" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
       <div class="bg-slate-50 border-b border-slate-200 px-6 py-3 flex flex-wrap justify-between items-center gap-2">
         <span id="resultHeaderTitle" class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
@@ -338,7 +330,6 @@
       <div id="resultContent" class="p-6 sm:p-8 prose max-w-none text-slate-800 text-sm sm:text-base leading-relaxed">
       </div>
 
-      <!-- ワンクリック移行ボタン群 -->
       <div id="themeActionArea" class="hidden bg-amber-50/50 border-t border-amber-200 p-5">
         <p class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5">
           <i class="fa-solid fa-circle-arrow-right text-amber-600"></i> 抽出された悩みを選んで、目次案を作成する:
@@ -348,7 +339,6 @@
       </div>
     </section>
 
-    <!-- 履歴セクション -->
     <section id="historySection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hidden">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
@@ -362,7 +352,6 @@
 
   </main>
 
-  <!-- 設定モーダル -->
   <div id="settingsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden px-4">
     <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200">
       <div class="flex justify-between items-center mb-4">
@@ -406,7 +395,6 @@
     &copy; note-research-mikke - AI Powered Note Writing Assistant
   </footer>
 
-  <!-- JavaScript Logic -->
   <script>
     let currentMarkdown = '';
     const STORAGE_KEY_WORKER = 'mikke_worker_url';
@@ -619,7 +607,6 @@
       showToast(`「${themeTitle.substring(0, 15)}...」を目次生成にセットしました！`);
     }
 
-    // STEP 2: 目次生成リクエスト
     async function handleTocSubmit(e) {
       e.preventDefault();
       const workerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
@@ -631,7 +618,7 @@
       if (!theme) return;
 
       document.getElementById('loadingTitle').textContent = '売れる目次構成案を作成中...';
-      document.getElementById('loadingSubtitle').textContent = '誰が見ても理解できる黄金目次プロロットをAIが構成中（10〜15秒）';
+      document.getElementById('loadingSubtitle').textContent = '誰が見ても理解できる黄金目次プロットをAIが構成中（10〜15秒）';
       document.getElementById('loadingArea').classList.remove('hidden');
 
       try {
@@ -656,7 +643,6 @@
       }
     }
 
-    // STEP 3: 確定した目次から完全パッケージを一括生成
     async function proceedToFullGeneration() {
       const workerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
       const theme = document.getElementById('theme').value.trim();
@@ -767,7 +753,6 @@
       }
     }
 
-    // TXTファイルダウンロード機能
     function downloadAsText() {
       if (!currentMarkdown) return;
       const theme = document.getElementById('theme').value.trim() || 'note_research';
