@@ -106,9 +106,9 @@
         <div>
           <h1 class="text-base font-bold text-slate-900 leading-tight flex items-center gap-2">
             note-research-mikke
-            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v2.5</span>
+            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v3.0</span>
           </h1>
-          <p class="text-xs text-slate-500">悩みリサーチ ＆ 売れる有料構成案・完全パッケージメーカー</p>
+          <p class="text-xs text-slate-500">HARM法則 ＆ 目次確認・修正型 本文パッケージ自動生成ツール</p>
         </div>
       </div>
       <button onclick="toggleSettingsModal()" class="text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-xl hover:bg-slate-100 transition flex items-center gap-1.5 text-xs font-semibold border border-slate-200 cursor-pointer">
@@ -120,13 +120,16 @@
 
   <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
 
-    <!-- STEP切替タブ -->
+    <!-- STEP切替ナビゲーション -->
     <div class="flex border-b border-slate-200 mb-6 gap-2 overflow-x-auto">
       <button id="tabResearch" onclick="switchTab('research')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-note-500 text-note-700 flex items-center gap-2 cursor-pointer transition shrink-0">
-        <i class="fa-solid fa-bullseye text-amber-500"></i> STEP 1: ターゲット悩みリサーチ
+        <i class="fa-solid fa-bullseye text-amber-500"></i> STEP 1: HARM悩みリサーチ
+      </button>
+      <button id="tabToc" onclick="switchTab('toc')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition shrink-0">
+        <i class="fa-solid fa-list-check text-blue-500"></i> STEP 2: 目次案の作成＆自由編集
       </button>
       <button id="tabOutline" onclick="switchTab('outline')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition shrink-0">
-        <i class="fa-solid fa-wand-magic-sparkles text-note-500"></i> STEP 2: 原稿・特典・動画プロンプト一括生成
+        <i class="fa-solid fa-wand-magic-sparkles text-note-500"></i> STEP 3: 本文・パッケージ一括生成
       </button>
     </div>
 
@@ -134,10 +137,10 @@
     <section id="sectionThemeFinder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
       <div class="flex items-center justify-between mb-2">
         <h2 id="researchTitle" class="text-base font-bold text-slate-900 flex items-center gap-2">
-          <i class="fa-solid fa-bullseye text-amber-500"></i> ターゲット層の「切実な悩みBEST3」を深掘りリサーチ
+          <i class="fa-solid fa-bullseye text-amber-500"></i> HARM法則に基づく「切実な悩みBEST3」を深掘りリサーチ
         </h2>
       </div>
-      <p id="researchSubtitle" class="text-xs text-slate-500 mb-4">読者のペルソナ（ターゲット層）を入力すると、その人が夜も眠れないほど悩んでいるリアルな本音をAIが抽出します。</p>
+      <p id="researchSubtitle" class="text-xs text-slate-500 mb-4">読者のペルソナ（ターゲット層）を入力すると、HARM法則（健康・キャリア・人間関係・お金）に基づき本音を抽出します。</p>
 
       <div class="flex gap-4 mb-5 p-2.5 bg-amber-50/60 rounded-xl border border-amber-200/80 text-xs font-bold text-slate-700">
         <label class="flex items-center gap-1.5 cursor-pointer hover:text-note-700">
@@ -185,43 +188,14 @@
       </form>
     </section>
 
-    <!-- STEP 2: 原稿・パッケージ一括生成フォーム -->
-    <section id="sectionOutlineBuilder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 hidden">
+    <!-- STEP 2: 目次案生成 ＆ 自由編集フォーム -->
+    <section id="sectionTocBuilder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 hidden">
       <h2 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
-        <i class="fa-solid fa-pen-ruler text-note-500"></i> 条件を確認して完全コピペパッケージを一括生成
+        <i class="fa-solid fa-list-check text-blue-500"></i> 条件を設定して「目次案（章立て）」をAI提案 ＆ 自由修正
       </h2>
-      <p class="text-xs text-slate-500 mb-5">「誰に」「どんな悩み」「読後のベネフィット」を盛り込み、原稿・SNS文・画像＆動画プロンプトを一括生成します。</p>
+      <p class="text-xs text-slate-500 mb-5">まずAIが構成プロット（目次案）を作成します。ご自身の体験談や独自のノウハウを目次エリアに直接書き加えて自由に磨き上げてください！</p>
 
-      <form id="researchForm" onsubmit="handleFormSubmit(event)" class="space-y-5">
-        
-        <!-- 販売パッケージ形式の選択 -->
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5">
-            販売パッケージ形式（特典資料の有無） <span class="text-rose-500">*</span>
-          </label>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label class="border border-slate-300 rounded-xl p-3.5 flex items-start gap-2.5 cursor-pointer hover:border-note-500 hover:bg-note-50/50 transition has-[:checked]:border-note-500 has-[:checked]:bg-note-50/60 has-[:checked]:ring-1 has-[:checked]:ring-note-500">
-              <input type="radio" name="packageType" value="full_package" checked class="mt-0.5 accent-note-500">
-              <div>
-                <p class="text-xs font-bold text-slate-900 flex items-center gap-1">
-                  🎁 フルパッケージ <span class="text-[10px] bg-note-100 text-note-700 px-1.5 py-0.2 rounded font-medium">おすすめ</span>
-                </p>
-                <p class="text-[11px] text-slate-500 mt-0.5">記事原稿 ＋ <strong>Word/PDF特典資料（10P相当）</strong> ＋ SNS ＋ 画像/動画プロンプト（高単価販売向け）</p>
-              </div>
-            </label>
-
-            <label class="border border-slate-300 rounded-xl p-3.5 flex items-start gap-2.5 cursor-pointer hover:border-note-500 hover:bg-note-50/50 transition has-[:checked]:border-note-500 has-[:checked]:bg-note-50/60 has-[:checked]:ring-1 has-[:checked]:ring-note-500">
-              <input type="radio" name="packageType" value="article_only" class="mt-0.5 accent-note-500">
-              <div>
-                <p class="text-xs font-bold text-slate-900 flex items-center gap-1">
-                  📄 記事のみ（爆速生成）
-                </p>
-                <p class="text-[11px] text-slate-500 mt-0.5">無料〜有料記事本文 ＋ SNS ＋ 画像/動画プロンプト（特典なし・手軽な低〜中価格販売向け）</p>
-              </div>
-            </label>
-          </div>
-        </div>
-
+      <form id="tocForm" onsubmit="handleTocSubmit(event)" class="space-y-4 mb-6">
         <div>
           <label for="theme" class="block text-xs font-bold text-slate-700 mb-1.5">
             メインテーマ（解決したい悩み・企画名） <span class="text-rose-500">*</span>
@@ -250,7 +224,7 @@
 
           <div>
             <label for="tone" class="block text-xs font-bold text-slate-700 mb-1.5">
-              文章のトーン（全6種）
+              文章のトーン（脱AI文章・全6種）
             </label>
             <select 
               id="tone" 
@@ -266,28 +240,75 @@
           </div>
         </div>
 
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">
+            販売パッケージ形式 <span class="text-rose-500">*</span>
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label class="border border-slate-300 rounded-xl p-3 flex items-start gap-2 cursor-pointer hover:bg-slate-50 transition has-[:checked]:border-note-500 has-[:checked]:bg-note-50/60">
+              <input type="radio" name="packageType" value="full_package" checked class="mt-0.5 accent-note-500">
+              <div>
+                <p class="text-xs font-bold text-slate-900">🎁 フルパッケージ（Word特典付き）</p>
+                <p class="text-[11px] text-slate-500">記事原稿 ＋ Word特典 ＋ SNS ＋ 動画プロンプト</p>
+              </div>
+            </label>
+
+            <label class="border border-slate-300 rounded-xl p-3 flex items-start gap-2 cursor-pointer hover:bg-slate-50 transition has-[:checked]:border-note-500 has-[:checked]:bg-note-50/60">
+              <input type="radio" name="packageType" value="article_only" class="mt-0.5 accent-note-500">
+              <div>
+                <p class="text-xs font-bold text-slate-900">📄 記事のみ（爆速生成）</p>
+                <p class="text-[11px] text-slate-500">記事本文 ＋ SNS ＋ 動画プロンプト</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
         <button 
           type="submit" 
-          id="submitBtn"
-          class="w-full bg-note-500 hover:bg-note-600 text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow-md transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
+          id="btnTocGenerate"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow-md transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
         >
-          <i class="fa-solid fa-wand-magic-sparkles"></i> 磨き上げた原稿・SNS文・動画プロンプトを一括生成
+          <i class="fa-solid fa-list-check"></i> まずは「黄金目次案（章立て）」をAIで作成する
         </button>
       </form>
+
+      <!-- 目次編集エリア（生成後に表示） -->
+      <div id="tocEditorContainer" class="hidden border-t border-slate-200 pt-5 mt-5">
+        <label for="tocEditor" class="block text-xs font-bold text-slate-800 mb-1 flex items-center justify-between">
+          <span><i class="fa-solid fa-pen-to-square text-note-600"></i> 目次構成案（自由に加筆・修正・項目の入れ替えが可能です）:</span>
+          <span class="text-[11px] text-amber-600 font-semibold">💡 体験談や独自のステップを付け加えると一気に売れます！</span>
+        </label>
+        <textarea 
+          id="tocEditor" 
+          rows="12" 
+          class="w-full p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-note-500 focus:outline-none font-mono text-xs sm:text-sm leading-relaxed bg-slate-50 text-slate-800 mb-4"
+        ></textarea>
+
+        <button 
+          type="button" 
+          onclick="proceedToFullGeneration()"
+          class="w-full bg-note-500 hover:bg-note-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
+        >
+          <i class="fa-solid fa-wand-magic-sparkles"></i> この目次で確定して本文＆完全パッケージを一括生成！
+        </button>
+      </div>
     </section>
+
+    <!-- STEP 3: 本文・パッケージ確認 ＆ 出力エリア -->
+    <section id="sectionOutlineBuilder" class="hidden"></section>
 
     <!-- ローディングエリア -->
     <div id="loadingArea" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm mb-8">
       <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-note-500 border-t-transparent mb-3"></div>
-      <p id="loadingTitle" class="text-slate-800 font-bold text-base">リサーチ＆パッケージ作成中...</p>
+      <p id="loadingTitle" class="text-slate-800 font-bold text-base">処理中...</p>
       <p id="loadingSubtitle" class="text-slate-500 text-xs mt-1">プロ品質で執筆中（15〜30秒）</p>
     </div>
 
-    <!-- 結果エリア -->
+    <!-- 結果表示エリア -->
     <section id="resultArea" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
       <div class="bg-slate-50 border-b border-slate-200 px-6 py-3 flex flex-wrap justify-between items-center gap-2">
         <span id="resultHeaderTitle" class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-file-lines text-note-600"></i> 生成結果（完全パッケージ）
+          <i class="fa-solid fa-file-lines text-note-600"></i> 生成結果
         </span>
         <div class="flex items-center gap-1.5 flex-wrap">
           <button onclick="copyToClipboard()" class="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
@@ -308,8 +329,8 @@
           <button id="btnCopyVideo" onclick="copyVideoToClipboard()" class="px-2.5 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-xs font-medium text-blue-700 hover:bg-blue-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
             <i class="fa-solid fa-video text-blue-600"></i> 🎬 動画プロンプト
           </button>
-          <button onclick="downloadAsText()" class="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-download"></i> TXT
+          <button onclick="downloadAsText()" class="px-2.5 py-1.5 bg-slate-800 text-white rounded-lg text-xs font-medium hover:bg-slate-900 transition flex items-center gap-1 shadow-xs cursor-pointer">
+            <i class="fa-solid fa-download"></i> TXT保存
           </button>
         </div>
       </div>
@@ -320,7 +341,7 @@
       <!-- ワンクリック移行ボタン群 -->
       <div id="themeActionArea" class="hidden bg-amber-50/50 border-t border-amber-200 p-5">
         <p class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5">
-          <i class="fa-solid fa-circle-arrow-right text-amber-600"></i> 抽出された悩みを選んで、そのまま原稿・SNS文・動画プロンプトを作成:
+          <i class="fa-solid fa-circle-arrow-right text-amber-600"></i> 抽出された悩みを選んで、目次案を作成する:
         </p>
         <div id="themeActionButtons" class="grid grid-cols-1 md:grid-cols-3 gap-3">
         </div>
@@ -409,8 +430,8 @@
       if (researchType === 'target') {
         targetGroup.classList.remove('hidden');
         genreGroup.classList.add('hidden');
-        title.innerHTML = '<i class="fa-solid fa-bullseye text-amber-500"></i> ターゲット層の「切実な悩みBEST3」を深掘りリサーチ';
-        subtitle.textContent = '読者のペルソナ（ターゲット層）を入力すると、その人が夜も眠れないほど悩んでいるリアルな本音をAIが抽出します。';
+        title.innerHTML = '<i class="fa-solid fa-bullseye text-amber-500"></i> HARM法則に基づく「切実な悩みBEST3」を深掘りリサーチ';
+        subtitle.textContent = '読者のペルソナ（ターゲット層）を入力すると、HARM法則（健康・キャリア・人間関係・お金）に基づき本音を抽出します。';
         btnText.textContent = 'ターゲットの「切実な悩みBEST3」を分析リサーチ';
       } else {
         genreGroup.classList.remove('hidden');
@@ -423,19 +444,27 @@
 
     function switchTab(mode) {
       const tabResearch = document.getElementById('tabResearch');
+      const tabToc = document.getElementById('tabToc');
       const tabOutline = document.getElementById('tabOutline');
+
       const sectionFinder = document.getElementById('sectionThemeFinder');
-      const sectionOutline = document.getElementById('sectionOutlineBuilder');
+      const sectionToc = document.getElementById('sectionTocBuilder');
+
+      tabResearch.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition shrink-0';
+      tabToc.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition shrink-0';
+      tabOutline.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition shrink-0';
 
       if (mode === 'research') {
         tabResearch.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-note-500 text-note-700 flex items-center gap-2 cursor-pointer transition shrink-0';
-        tabOutline.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition shrink-0';
         sectionFinder.classList.remove('hidden');
-        sectionOutline.classList.add('hidden');
+        sectionToc.classList.add('hidden');
+      } else if (mode === 'toc') {
+        tabToc.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-blue-500 text-blue-700 flex items-center gap-2 cursor-pointer transition shrink-0';
+        sectionToc.classList.remove('hidden');
+        sectionFinder.classList.add('hidden');
       } else {
         tabOutline.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-note-500 text-note-700 flex items-center gap-2 cursor-pointer transition shrink-0';
-        tabResearch.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition shrink-0';
-        sectionOutline.classList.remove('hidden');
+        sectionToc.classList.remove('hidden');
         sectionFinder.classList.add('hidden');
       }
     }
@@ -492,8 +521,8 @@
         return;
       }
 
-      document.getElementById('loadingTitle').textContent = 'ディープリサーチ中...';
-      document.getElementById('loadingSubtitle').textContent = '読者の生の声をAIが分析抽出中（15〜25秒）';
+      document.getElementById('loadingTitle').textContent = 'HARMディープリサーチ中...';
+      document.getElementById('loadingSubtitle').textContent = '読者の切実な悩みをAIが分析抽出中（15〜25秒）';
       document.getElementById('loadingArea').classList.remove('hidden');
       document.getElementById('resultArea').classList.add('hidden');
       document.getElementById('themeActionArea').classList.add('hidden');
@@ -560,15 +589,15 @@
           const targetText = targetMatches[index] ? targetMatches[index][1].trim() : defaultTarget;
 
           const btn = document.createElement('button');
-          btn.className = 'w-full bg-white border border-amber-300 hover:border-note-500 hover:bg-note-50 text-slate-800 p-3.5 rounded-xl transition text-left cursor-pointer flex flex-col justify-between shadow-xs group';
+          btn.className = 'w-full bg-white border border-amber-300 hover:border-blue-500 hover:bg-blue-50 text-slate-800 p-3.5 rounded-xl transition text-left cursor-pointer flex flex-col justify-between shadow-xs group';
           btn.onclick = () => applyThemeAndSwitch(rawTitle, targetText);
           btn.innerHTML = `
             <div>
               <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 mb-1.5">${badge}</span>
-              <p class="text-xs font-bold text-slate-900 group-hover:text-note-700 line-clamp-2 leading-snug">${escapeHtml(rawTitle)}</p>
+              <p class="text-xs font-bold text-slate-900 group-hover:text-blue-700 line-clamp-2 leading-snug">${escapeHtml(rawTitle)}</p>
             </div>
-            <div class="mt-3 text-[11px] text-note-600 font-bold flex items-center justify-between border-t border-slate-100 pt-2">
-              <span>この内容で原稿＆動画プロンプトを作成</span>
+            <div class="mt-3 text-[11px] text-blue-600 font-bold flex items-center justify-between border-t border-slate-100 pt-2">
+              <span>この悩みで目次案を作成する</span>
               <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </div>
           `;
@@ -585,12 +614,13 @@
       if (targetText) {
         document.getElementById('target').value = targetText;
       }
-      switchTab('outline');
-      document.getElementById('sectionOutlineBuilder').scrollIntoView({ behavior: 'smooth' });
-      showToast(`「${themeTitle.substring(0, 15)}...」をセットしました！`);
+      switchTab('toc');
+      document.getElementById('sectionTocBuilder').scrollIntoView({ behavior: 'smooth' });
+      showToast(`「${themeTitle.substring(0, 15)}...」を目次生成にセットしました！`);
     }
 
-    async function handleFormSubmit(e) {
+    // STEP 2: 目次生成リクエスト
+    async function handleTocSubmit(e) {
       e.preventDefault();
       const workerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
       const theme = document.getElementById('theme').value.trim();
@@ -600,27 +630,64 @@
 
       if (!theme) return;
 
-      document.getElementById('loadingTitle').textContent = '完全パッケージを構築中...';
-      document.getElementById('loadingSubtitle').textContent = packageType === 'article_only' 
-        ? '原稿・SNS文・動画プロンプトを高速生成中（10〜15秒）' 
-        : '原稿・Word特典・SNS文・動画プロンプトを生成中（20〜30秒）';
+      document.getElementById('loadingTitle').textContent = '売れる目次構成案を作成中...';
+      document.getElementById('loadingSubtitle').textContent = '誰が見ても理解できる黄金目次プロロットをAIが構成中（10〜15秒）';
       document.getElementById('loadingArea').classList.remove('hidden');
-      document.getElementById('resultArea').classList.add('hidden');
-      document.getElementById('themeActionArea').classList.add('hidden');
 
       try {
         if (workerUrl) {
           const response = await fetch(workerUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'generate_outline', theme, target, tone, packageType })
+            body: JSON.stringify({ action: 'generate_toc', theme, target, tone, packageType })
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'エラーが発生しました');
+          
+          document.getElementById('tocEditor').value = data.result;
+          document.getElementById('tocEditorContainer').classList.remove('hidden');
+          document.getElementById('tocEditorContainer').scrollIntoView({ behavior: 'smooth' });
+          showToast('目次構成案を作成しました！必要に応じて修正してください。');
+        }
+      } catch (err) {
+        showToast(`エラー: ${err.message}`, true);
+      } finally {
+        document.getElementById('loadingArea').classList.add('hidden');
+      }
+    }
+
+    // STEP 3: 確定した目次から完全パッケージを一括生成
+    async function proceedToFullGeneration() {
+      const workerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
+      const theme = document.getElementById('theme').value.trim();
+      const target = document.getElementById('target').value.trim();
+      const tone = document.getElementById('tone').value;
+      const packageType = document.querySelector('input[name="packageType"]:checked').value;
+      const approvedToc = document.getElementById('tocEditor').value.trim();
+
+      if (!approvedToc) {
+        showToast('目次案を入力してください。', true);
+        return;
+      }
+
+      document.getElementById('loadingTitle').textContent = '完全パッケージを一括構築中...';
+      document.getElementById('loadingSubtitle').textContent = '確定された目十分に完全準拠し、脱AI文章で執筆中（20〜30秒）';
+      document.getElementById('loadingArea').classList.remove('hidden');
+      document.getElementById('resultArea').classList.add('hidden');
+
+      try {
+        if (workerUrl) {
+          const response = await fetch(workerUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'generate_full', theme, target, tone, packageType, approvedToc })
           });
           const data = await response.json();
           if (!response.ok) throw new Error(data.error || 'エラーが発生しました');
           currentMarkdown = data.result;
         }
 
-        document.getElementById('resultHeaderTitle').innerHTML = '<i class="fa-solid fa-file-lines text-note-600"></i> 生成結果（完全コピペパッケージ）';
+        document.getElementById('resultHeaderTitle').innerHTML = '<i class="fa-solid fa-file-lines text-note-600"></i> 生成結果（確定目次ベース完全コピペパッケージ）';
         document.getElementById('btnCopyHashtags').classList.remove('hidden');
         document.getElementById('btnCopyArticle').classList.remove('hidden');
         document.getElementById('btnCopySns').classList.remove('hidden');
@@ -631,7 +698,7 @@
         document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
 
         saveToHistory(theme, currentMarkdown);
-        showToast('生成が完了しました！');
+        showToast('完全パッケージの生成が完了しました！');
 
       } catch (err) {
         showToast(`エラー: ${err.message}`, true);
@@ -700,6 +767,7 @@
       }
     }
 
+    // TXTファイルダウンロード機能
     function downloadAsText() {
       if (!currentMarkdown) return;
       const theme = document.getElementById('theme').value.trim() || 'note_research';
@@ -708,7 +776,7 @@
       link.href = URL.createObjectURL(blob);
       link.download = `${theme}_完成パッケージ.txt`;
       link.click();
-      showToast('テキストファイルを保存しました');
+      showToast('テキストファイルをダウンロードしました！');
     }
 
     function saveToHistory(theme, content) {
