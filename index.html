@@ -1,1111 +1,264 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>note-research-mikke | note悩みリサーチ＆売れる構成自動生成ツール</title>
-  
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%2322c55e'/><text x='50' y='72' font-size='64' font-weight='bold' text-anchor='middle' fill='white' font-family='sans-serif'>み</text></svg>">
+export default {
+  async fetch(request, env, ctx) {
+    // CORSヘッダーの設定
+    const corsHeaders = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    };
 
-  <!-- Tailwind CSS & Icons -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            note: {
-              50: '#f0fdf4',
-              100: '#dcfce7',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d',
-              dark: '#222222',
-            }
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    .prose h2 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #0f172a;
-      margin-top: 1.75rem;
-      margin-bottom: 0.875rem;
-      padding-left: 0.875rem;
-      border-left: 5px solid #22c55e;
-      background-color: #f8fafc;
-      padding-top: 0.5rem;
-      padding-bottom: 0.5rem;
-      border-radius: 0 0.5rem 0.5rem 0;
-    }
-    .prose h3 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #1e293b;
-      margin-top: 1.25rem;
-      margin-bottom: 0.5rem;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 0.25rem;
-    }
-    .prose ul {
-      list-style-type: disc;
-      padding-left: 1.25rem;
-      margin-top: 0.5rem;
-      margin-bottom: 0.75rem;
-    }
-    .prose li {
-      margin-bottom: 0.375rem;
-      color: #334155;
-    }
-    .prose p {
-      margin-bottom: 0.875rem;
-      color: #334155;
-      line-height: 1.75;
-    }
-    .prose strong {
-      color: #15803d;
-      font-weight: 600;
-    }
-    .prose code {
-      background-color: #f1f5f9;
-      color: #0f172a;
-      padding: 0.2rem 0.4rem;
-      border-radius: 0.25rem;
-      font-size: 0.875em;
-    }
-    .prose pre {
-      background-color: #0f172a;
-      color: #f8fafc;
-      padding: 1rem;
-      border-radius: 0.75rem;
-      overflow-x: auto;
-      margin: 1rem 0;
-    }
-    .prose pre code {
-      background-color: transparent;
-      color: inherit;
-      padding: 0;
-    }
-  </style>
-</head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased relative">
-
-  <!-- Header -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
-    <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-      <!-- 1クリックでトップ戻り / 2クリックでリセット（最初から） -->
-      <div 
-        id="headerLogoTitle" 
-        onclick="handleHeaderClick()" 
-        ondblclick="handleHeaderDblClick()" 
-        title="1クリック: 画面トップに戻る / 2クリック: 最初からスタート（リセット）"
-        class="flex items-center space-x-3 cursor-pointer select-none group hover:opacity-90 transition p-1 rounded-xl"
-      >
-        <div class="w-9 h-9 rounded-xl bg-note-500 text-white flex items-center justify-center font-bold text-xl shadow-sm group-hover:scale-105 transition-transform duration-200">
-          み
-        </div>
-        <div>
-          <h1 class="text-base font-bold text-slate-900 leading-tight flex items-center gap-2">
-            note-research-mikke
-            <span class="text-[10px] bg-note-100 text-note-700 px-2 py-0.5 rounded-full font-medium">v4.2</span>
-          </h1>
-          <p class="text-xs text-slate-500 group-hover:text-note-600 transition-colors">HARM法則 ＆ 全5話マガジンロードマップ・目次自由編集ツール</p>
-        </div>
-      </div>
-      <button onclick="toggleSettingsModal()" class="text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-xl hover:bg-slate-100 transition flex items-center gap-1.5 text-xs font-semibold border border-slate-200 cursor-pointer">
-        <i class="fa-solid fa-gear text-slate-500"></i>
-        <span>設定</span>
-      </button>
-    </div>
-  </header>
-
-  <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
-
-    <!-- STEP切替ナビゲーション -->
-    <div class="flex border-b border-slate-200 mb-6 gap-2 overflow-x-auto">
-      <button id="tabResearch" onclick="switchTab('research')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-note-500 text-note-700 flex items-center gap-2 cursor-pointer transition shrink-0">
-        <i class="fa-solid fa-bullseye text-amber-500"></i> STEP 1: HARM悩みリサーチ
-      </button>
-
-      <button id="tabSeries" onclick="switchTab('series')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition shrink-0">
-        <i class="fa-solid fa-layer-group text-purple-500"></i> STEP 1.5: 📚 連載マガジンロードマップ（全5話）
-      </button>
-
-      <button id="tabToc" onclick="switchTab('toc')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition shrink-0">
-        <i class="fa-solid fa-list-check text-blue-500"></i> STEP 2: 目次案の作成＆自由編集
-      </button>
-
-      <button id="tabOutline" onclick="switchTab('outline')" class="px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition shrink-0">
-        <i class="fa-solid fa-wand-magic-sparkles text-note-500"></i> STEP 3: 本文・パッケージ一括生成
-      </button>
-    </div>
-
-    <!-- STEP 1: リサーチフォーム -->
-    <section id="sectionThemeFinder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
-      <div class="flex items-center justify-between mb-2">
-        <h2 id="researchTitle" class="text-base font-bold text-slate-900 flex items-center gap-2">
-          <i class="fa-solid fa-bullseye text-amber-500"></i> HARM法則に基づく「切実な悩みBEST3」を深掘りリサーチ
-        </h2>
-      </div>
-      <p id="researchSubtitle" class="text-xs text-slate-500 mb-4">読者のペルソナ（ターゲット層）を入力すると、HARM法則（健康・キャリア・人間関係・お金）に基づき本音を抽出します。</p>
-
-      <div class="flex gap-4 mb-5 p-2.5 bg-amber-50/60 rounded-xl border border-amber-200/80 text-xs font-bold text-slate-700">
-        <label class="flex items-center gap-1.5 cursor-pointer hover:text-note-700">
-          <input type="radio" name="researchType" value="target" checked onchange="toggleResearchInput()" class="accent-note-500">
-          <span>🎯 ターゲット層から「切実な悩みBEST3」を探す</span>
-        </label>
-        <label class="flex items-center gap-1.5 cursor-pointer hover:text-note-700">
-          <input type="radio" name="researchType" value="genre" onchange="toggleResearchInput()" class="accent-note-500">
-          <span>📂 大枠ジャンルから「売れるテーマBEST3」を探す</span>
-        </label>
-      </div>
-
-      <form id="themeFinderForm" onsubmit="handleThemeFinderSubmit(event)" class="space-y-4">
-        <div id="targetInputGroup">
-          <label for="targetInput" class="block text-xs font-bold text-slate-700 mb-1.5">
-            読者のペルソナ（ターゲット層） <span class="text-rose-500">*</span>
-          </label>
-          <input 
-            type="text" 
-            id="targetInput" 
-            placeholder="例: 将来のキャリアに不安がある40〜50代会社員、100が切れないアマチュアゴルファー、副業初心者" 
-            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-note-500 focus:border-transparent transition text-sm"
-          >
-        </div>
-
-        <div id="genreInputGroup" class="hidden">
-          <label for="genre" class="block text-xs font-bold text-slate-700 mb-1.5">
-            大枠ジャンル・分野 <span class="text-rose-500">*</span>
-          </label>
-          <input 
-            type="text" 
-            id="genre" 
-            placeholder="例: 生成AI活用、50代のキャリア、ゴルフ100切り、Instagram運用、副業" 
-            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-note-500 focus:border-transparent transition text-sm"
-          >
-        </div>
-
-        <button 
-          type="submit" 
-          id="finderBtn"
-          class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow-md transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
-        >
-          <i class="fa-solid fa-magnifying-glass font-bold"></i> <span id="btnText">ターゲットの「切実な悩みBEST3」を分析リサーチ</span>
-        </button>
-      </form>
-    </section>
-
-    <!-- STEP 1.5: シリーズ連載ロードマップ作成フォーム -->
-    <section id="sectionSeriesBuilder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 hidden">
-      <h2 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
-        <i class="fa-solid fa-layer-group text-purple-600"></i> 全5話完結型「マガジン連載ロードマップ企画」の提案
-      </h2>
-      <p class="text-xs text-slate-500 mb-5">単発（1記事）で終わらせず、全5話の連続マガジンとして高単価リピート購入を生む全体のロードマップをAIが自動設計します。</p>
-
-      <form id="seriesForm" onsubmit="handleSeriesSubmit(event)" class="space-y-4 mb-6">
-        <div>
-          <label for="seriesTheme" class="block text-xs font-bold text-slate-700 mb-1.5">
-            連載のメインテーマ（企画像・ゴール） <span class="text-rose-500">*</span>
-          </label>
-          <input 
-            type="text" 
-            id="seriesTheme" 
-            required
-            placeholder="例: 50代から始める実践AI業務効率化完全マスター講座" 
-            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition text-sm"
-          >
-        </div>
-
-        <div>
-          <label for="seriesTarget" class="block text-xs font-bold text-slate-700 mb-1.5">
-            ターゲット層
-          </label>
-          <input 
-            type="text" 
-            id="seriesTarget" 
-            placeholder="例: 後輩に聞かずにAIをマスターしたい40〜50代管理職" 
-            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition text-sm"
-          >
-        </div>
-
-        <button 
-          type="submit" 
-          id="btnSeriesGenerate"
-          class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow-md transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
-        >
-          <i class="fa-solid fa-layer-group"></i> 全5話のマガジン連載ロードマップを自動設計する
-        </button>
-      </form>
-    </section>
-
-    <!-- STEP 2: 目次案生成 ＆ 自由編集フォーム -->
-    <section id="sectionTocBuilder" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 hidden">
-      <h2 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
-        <i class="fa-solid fa-list-check text-blue-500"></i> 条件を設定して「目次案（章立て）」をAI提案 ＆ 自由修正
-      </h2>
-      <p class="text-xs text-slate-500 mb-5">まずAIが構成プロット（目次案）を作成します。ご自身の体験談や独自のノウハウを目次エリアに直接書き加えて自由に磨き上げてください！</p>
-
-      <form id="tocForm" onsubmit="handleTocSubmit(event)" class="space-y-4 mb-6">
-        <div>
-          <label for="theme" class="block text-xs font-bold text-slate-700 mb-1.5">
-            メインテーマ（解決したい悩み・企画名・何話目か） <span class="text-rose-500">*</span>
-          </label>
-          <input 
-            type="text" 
-            id="theme" 
-            required
-            placeholder="例: 【第1話】50代からのキャリア再設計、後輩に聞かずにマスターするAI活用法" 
-            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-note-500 focus:border-transparent transition text-sm"
-          >
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label for="target" class="block text-xs font-bold text-slate-700 mb-1.5">
-              ターゲット層（誰に向けて書くか）
-            </label>
-            <input 
-              type="text" 
-              id="target" 
-              placeholder="例: 将来に不安を感じる40〜50代会社員" 
-              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-note-500 focus:border-transparent transition text-sm"
-            >
-          </div>
-
-          <div>
-            <label for="tone" class="block text-xs font-bold text-slate-700 mb-1.5">
-              文章のトーン（脱AI文章・全6種）
-            </label>
-            <select 
-              id="tone" 
-              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-note-500 focus:border-transparent transition text-sm bg-white"
-            >
-              <option value="親しみやすく共感重視">親しみやすく共感重視（です・ます）</option>
-              <option value="論理的でプロフェッショナル">論理的でプロフェッショナル（だ・である）</option>
-              <option value="熱量が高く背中を押すスタイル">熱量が高く背中を押すスタイル</option>
-              <option value="泥臭い体験談・ストーリー型（失敗からの逆転）">🔥 泥臭い体験談・ストーリー型（失敗からの逆転）</option>
-              <option value="淡々と実用重視・テンプレ徹底解説（時短・ノウハウ派）">⚡ 淡々と実用重視・テンプレ徹底解説（時短・ノウハウ派）</option>
-              <option value="ズバッと本音・愛ある辛口スタイル（覚醒・本音派）">🎯 ズバッと本音・愛ある辛口スタイル（覚醒・本音派）</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5">
-            販売パッケージ形式 <span class="text-rose-500">*</span>
-          </label>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label class="border border-slate-300 rounded-xl p-3 flex items-start gap-2 cursor-pointer hover:bg-slate-50 transition has-[:checked]:border-note-500 has-[:checked]:bg-note-50/60">
-              <input type="radio" name="packageType" value="full_package" checked class="mt-0.5 accent-note-500">
-              <div>
-                <p class="text-xs font-bold text-slate-900">🎁 フルパッケージ（Word特典付き）</p>
-                <p class="text-[11px] text-slate-500">記事原稿 ＋ Word特典 ＋ SNS ＋ 動画プロンプト</p>
-              </div>
-            </label>
-
-            <label class="border border-slate-300 rounded-xl p-3 flex items-start gap-2 cursor-pointer hover:bg-slate-50 transition has-[:checked]:border-note-500 has-[:checked]:bg-note-50/60">
-              <input type="radio" name="packageType" value="article_only" class="mt-0.5 accent-note-500">
-              <div>
-                <p class="text-xs font-bold text-slate-900">📄 記事のみ（爆速生成）</p>
-                <p class="text-[11px] text-slate-500">記事本文 ＋ SNS ＋ 動画プロンプト</p>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <button 
-          type="submit" 
-          id="btnTocGenerate"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow-md transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
-        >
-          <i class="fa-solid fa-list-check"></i> まずは「黄金目次案（章立て）」をAIで作成する
-        </button>
-      </form>
-
-      <!-- 目次編集エリア（生成後に表示） -->
-      <div id="tocEditorContainer" class="hidden border-t border-slate-200 pt-5 mt-5">
-        <label for="tocEditor" class="block text-xs font-bold text-slate-800 mb-1 flex items-center justify-between">
-          <span><i class="fa-solid fa-pen-to-square text-note-600"></i> 目次構成案（自由に加筆・修正・項目の入れ替えが可能です）:</span>
-          <span class="text-[11px] text-amber-600 font-semibold">💡 体験談や独自のステップを付け加えると一気に売れます！</span>
-        </label>
-        <textarea 
-          id="tocEditor" 
-          rows="12" 
-          class="w-full p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-note-500 focus:outline-none font-mono text-xs sm:text-sm leading-relaxed bg-slate-50 text-slate-800 mb-4"
-        ></textarea>
-
-        <button 
-          type="button" 
-          onclick="proceedToFullGeneration()"
-          class="w-full bg-note-500 hover:bg-note-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
-        >
-          <i class="fa-solid fa-wand-magic-sparkles"></i> この目次で確定して本文＆完全パッケージを一括生成！
-        </button>
-      </div>
-    </section>
-
-    <!-- STEP 3: 本文・パッケージ確認 ＆ 出力エリア -->
-    <section id="sectionOutlineBuilder" class="hidden"></section>
-
-    <!-- ローディングエリア -->
-    <div id="loadingArea" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm mb-8">
-      <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-note-500 border-t-transparent mb-3"></div>
-      <p id="loadingTitle" class="text-slate-800 font-bold text-base">処理中...</p>
-      <p id="loadingSubtitle" class="text-slate-500 text-xs mt-1">プロ品質で執筆中（15〜30秒）</p>
-    </div>
-
-    <!-- 結果表示エリア -->
-    <section id="resultArea" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
-      <div class="bg-slate-50 border-b border-slate-200 px-6 py-3 flex flex-wrap justify-between items-center gap-2">
-        <span id="resultHeaderTitle" class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-file-lines text-note-600"></i> 生成結果
-        </span>
-        <div class="flex items-center gap-1.5 flex-wrap">
-          <button onclick="copyToClipboard()" class="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-regular fa-copy"></i> 全文
-          </button>
-          <button id="btnCopyHashtags" onclick="copyHashtagsToClipboard()" class="px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-xs font-medium text-amber-800 hover:bg-amber-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-hashtag text-amber-600"></i> ハッシュタグ
-          </button>
-          <button id="btnCopyArticle" onclick="copyArticleAndBonusToClipboard()" class="px-2.5 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-medium text-emerald-800 hover:bg-emerald-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-file-pen text-emerald-600"></i> 原稿＆Word特典
-          </button>
-          <button id="btnCopySns" onclick="copySnsToClipboard()" class="px-2.5 py-1.5 bg-note-50 border border-note-200 rounded-lg text-xs font-medium text-note-700 hover:bg-note-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-share-nodes text-note-600"></i> SNS告知文
-          </button>
-          <button id="btnCopyMj" onclick="copyMidjourneyToClipboard()" class="px-2.5 py-1.5 bg-purple-50 border border-purple-200 rounded-lg text-xs font-medium text-purple-700 hover:bg-purple-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-image text-purple-600"></i> サムネプロンプト
-          </button>
-          <button id="btnCopyVideo" onclick="copyVideoToClipboard()" class="px-2.5 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-xs font-medium text-blue-700 hover:bg-blue-100 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-video text-blue-600"></i> 🎬 動画プロンプト
-          </button>
-          <button onclick="downloadAsText()" class="px-2.5 py-1.5 bg-slate-800 text-white rounded-lg text-xs font-medium hover:bg-slate-900 transition flex items-center gap-1 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-download"></i> TXT保存
-          </button>
-        </div>
-      </div>
-
-      <div id="resultContent" class="p-6 sm:p-8 prose max-w-none text-slate-800 text-sm sm:text-base leading-relaxed">
-      </div>
-
-      <!-- ワンクリック移行ボタン群 -->
-      <div id="themeActionArea" class="hidden bg-amber-50/50 border-t border-amber-200 p-5">
-        <p class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5">
-          <i class="fa-solid fa-circle-arrow-right text-amber-600"></i> アクション選択:
-        </p>
-        <div id="themeActionButtons" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        </div>
-      </div>
-    </section>
-
-    <!-- 履歴セクション -->
-    <section id="historySection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hidden">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-          <i class="fa-solid fa-clock-rotate-left text-slate-500"></i> リサーチ・連載履歴（直近5件）
-        </h2>
-        <button onclick="clearHistory()" class="text-xs text-rose-500 hover:underline cursor-pointer">履歴を全消去</button>
-      </div>
-      <div id="historyList" class="space-y-2">
-      </div>
-    </section>
-
-  </main>
-
-  <!-- 設定モーダル -->
-  <div id="settingsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden px-4">
-    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-          <i class="fa-solid fa-sliders text-note-500"></i> アプリ連携設定
-        </h3>
-        <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-      
-      <div class="space-y-4">
-        <div>
-          <label for="workerUrl" class="block text-xs font-bold text-slate-700 mb-1">
-            Cloudflare Worker URL <span class="text-rose-500">*</span>
-          </label>
-          <input 
-            type="url" 
-            id="workerUrl" 
-            placeholder="https://note-research-mikke.yymmatsu.workers.dev" 
-            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-note-500 focus:outline-none"
-          >
-          <p class="text-[11px] text-slate-500 mt-1">Cloudflare Worker の Endpoint URL を設定します。</p>
-        </div>
-      </div>
-
-      <div class="mt-6 flex justify-end">
-        <button onclick="saveSettings()" class="bg-note-500 hover:bg-note-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition cursor-pointer">
-          設定を保存する
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div id="toast" class="fixed bottom-6 right-6 bg-slate-900/90 backdrop-blur-sm text-white px-4 py-3 rounded-xl shadow-xl text-xs font-medium translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50 flex items-center gap-2">
-    <i id="toastIcon" class="fa-solid fa-circle-check text-note-500"></i>
-    <span id="toastMsg">通知テキスト</span>
-  </div>
-
-  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
-    &copy; note-research-mikke - AI Powered Note Writing Assistant
-  </footer>
-
-  <!-- JavaScript Logic -->
-  <script>
-    let currentMarkdown = '';
-    let clickTimer = null;
-    const STORAGE_KEY_WORKER = 'mikke_worker_url';
-    const STORAGE_KEY_HISTORY = 'mikke_research_history';
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const savedWorkerUrl = localStorage.getItem(STORAGE_KEY_WORKER) || 'https://note-research-mikke.yymmatsu.workers.dev';
-      document.getElementById('workerUrl').value = savedWorkerUrl;
-      localStorage.setItem(STORAGE_KEY_WORKER, savedWorkerUrl);
-      renderHistory();
-    });
-
-    // 1クリック（シングルクリック）: 画面最上部（トップ）へスクロール
-    function handleHeaderClick() {
-      if (clickTimer) clearTimeout(clickTimer);
-      clickTimer = setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        showToast('画面トップへ移動しました');
-      }, 250);
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers: corsHeaders });
     }
 
-    // 2クリック（ダブルクリック）: 最初からスタート（初期状態にリセット）
-    function handleHeaderDblClick() {
-      if (clickTimer) {
-        clearTimeout(clickTimer);
-        clickTimer = null;
-      }
-      
-      // 入力フォームクリア
-      document.getElementById('targetInput').value = '';
-      document.getElementById('genre').value = '';
-      document.getElementById('seriesTheme').value = '';
-      document.getElementById('seriesTarget').value = '';
-      document.getElementById('theme').value = '';
-      document.getElementById('target').value = '';
-      document.getElementById('tocEditor').value = '';
-
-      // 表示セクション非表示
-      document.getElementById('tocEditorContainer').classList.add('hidden');
-      document.getElementById('resultArea').classList.add('hidden');
-      document.getElementById('themeActionArea').classList.add('hidden');
-      currentMarkdown = '';
-
-      // STEP 1 タブに戻す
-      switchTab('research');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      showToast('最初からスタート（初期状態にリセット）しました！');
+    if (request.method !== 'POST') {
+      return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
+        status: 405,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    function toggleResearchInput() {
-      const researchType = document.querySelector('input[name="researchType"]:checked').value;
-      const targetGroup = document.getElementById('targetInputGroup');
-      const genreGroup = document.getElementById('genreInputGroup');
-      const title = document.getElementById('researchTitle');
-      const subtitle = document.getElementById('researchSubtitle');
-      const btnText = document.getElementById('btnText');
+    try {
+      const body = await request.json();
+      const { action, genre, targetInput, mode, theme, target, tone, packageType, approvedToc } = body;
 
-      if (researchType === 'target') {
-        targetGroup.classList.remove('hidden');
-        genreGroup.classList.add('hidden');
-        title.innerHTML = '<i class="fa-solid fa-bullseye text-amber-500"></i> HARM法則に基づく「切実な悩みBEST3」を深掘りリサーチ';
-        subtitle.textContent = '読者のペルソナ（ターゲット層）を入力すると、HARM法則（健康・キャリア・人間関係・お金）に基づき本音を抽出します。';
-        btnText.textContent = 'ターゲットの「切実な悩みBEST3」を分析リサーチ';
-      } else {
-        genreGroup.classList.remove('hidden');
-        targetGroup.classList.add('hidden');
-        title.innerHTML = '<i class="fa-solid fa-fire text-amber-500"></i> 大枠ジャンルからX/noteで売れるテーマBEST3を抽出';
-        subtitle.textContent = 'AIや副業、ゴルフ、人間関係など、探したい「大枠のジャンル」を入力してください。';
-        btnText.textContent = 'X & noteでバズる「売れるテーマBEST3」を分析抽出';
-      }
-    }
-
-    function switchTab(mode) {
-      const tabResearch = document.getElementById('tabResearch');
-      const tabSeries = document.getElementById('tabSeries');
-      const tabToc = document.getElementById('tabToc');
-      const tabOutline = document.getElementById('tabOutline');
-
-      const sectionFinder = document.getElementById('sectionThemeFinder');
-      const sectionSeries = document.getElementById('sectionSeriesBuilder');
-      const sectionToc = document.getElementById('sectionTocBuilder');
-
-      const tabs = [tabResearch, tabSeries, tabToc, tabOutline];
-      tabs.forEach(t => t.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition shrink-0');
-
-      sectionFinder.classList.add('hidden');
-      sectionSeries.classList.add('hidden');
-      sectionToc.classList.add('hidden');
-
-      if (mode === 'research') {
-        tabResearch.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-note-500 text-note-700 flex items-center gap-2 cursor-pointer transition shrink-0';
-        sectionFinder.classList.remove('hidden');
-      } else if (mode === 'series') {
-        tabSeries.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-purple-500 text-purple-700 flex items-center gap-2 cursor-pointer transition shrink-0';
-        sectionSeries.classList.remove('hidden');
-      } else if (mode === 'toc') {
-        tabToc.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-blue-500 text-blue-700 flex items-center gap-2 cursor-pointer transition shrink-0';
-        sectionToc.classList.remove('hidden');
-      } else {
-        tabOutline.className = 'px-4 py-2.5 text-xs font-bold border-b-2 border-note-500 text-note-700 flex items-center gap-2 cursor-pointer transition shrink-0';
-        sectionToc.classList.remove('hidden');
-      }
-    }
-
-    function showToast(message, isError = false) {
-      const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toastMsg');
-      const toastIcon = document.getElementById('toastIcon');
-
-      toastMsg.textContent = message;
-      if (isError) {
-        toastIcon.className = 'fa-solid fa-circle-exclamation text-rose-400';
-      } else {
-        toastIcon.className = 'fa-solid fa-circle-check text-note-500';
-      }
-
-      toast.classList.remove('translate-y-20', 'opacity-0');
-      toast.classList.add('translate-y-0', 'opacity-100');
-
-      setTimeout(() => {
-        toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('translate-y-20', 'opacity-0');
-      }, 3000);
-    }
-
-    function toggleSettingsModal() {
-      document.getElementById('settingsModal').classList.toggle('hidden');
-    }
-
-    function saveSettings() {
-      const url = document.getElementById('workerUrl').value.trim();
-      if (!url) {
-        showToast('Worker URLを入力してください。', true);
-        return;
-      }
-      localStorage.setItem(STORAGE_KEY_WORKER, url);
-      toggleSettingsModal();
-      showToast('Worker URL設定を保存しました！');
-    }
-
-    async function handleThemeFinderSubmit(e) {
-      e.preventDefault();
-      const workerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
-      const researchType = document.querySelector('input[name="researchType"]:checked').value;
-      const targetInput = document.getElementById('targetInput').value.trim();
-      const genre = document.getElementById('genre').value.trim();
-
-      if (researchType === 'target' && !targetInput) {
-        showToast('ターゲット層を入力してください', true);
-        return;
-      }
-      if (researchType === 'genre' && !genre) {
-        showToast('ジャンルを入力してください', true);
-        return;
-      }
-
-      document.getElementById('loadingTitle').textContent = 'HARMディープリサーチ中...';
-      document.getElementById('loadingSubtitle').textContent = '読者の切実な悩みをAIが分析抽出中（15〜25秒）';
-      document.getElementById('loadingArea').classList.remove('hidden');
-      document.getElementById('resultArea').classList.add('hidden');
-      document.getElementById('themeActionArea').classList.add('hidden');
-
-      try {
-        if (workerUrl) {
-          const response = await fetch(workerUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              action: 'find_themes', 
-              genre: genre, 
-              targetInput: targetInput, 
-              mode: researchType === 'target' ? 'target_concerns' : 'genre_themes' 
-            })
-          });
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.error || 'エラーが発生しました');
-          currentMarkdown = data.result;
-        }
-
-        document.getElementById('resultHeaderTitle').innerHTML = researchType === 'target' 
-          ? '<i class="fa-solid fa-bullseye text-amber-500"></i> リサーチ結果：ターゲットの切実な悩みBEST3' 
-          : '<i class="fa-solid fa-fire text-amber-500"></i> リサーチ結果：売れるテーマBEST3';
-
-        document.getElementById('btnCopyHashtags').classList.add('hidden');
-        document.getElementById('btnCopyArticle').classList.add('hidden');
-        document.getElementById('btnCopySns').classList.add('hidden');
-        document.getElementById('btnCopyMj').classList.add('hidden');
-        document.getElementById('btnCopyVideo').classList.add('hidden');
-        document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
-        
-        renderThemeActionButtons(currentMarkdown, researchType === 'target' ? targetInput : genre);
-
-        document.getElementById('resultArea').classList.remove('hidden');
-        document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
-
-        saveToHistory(`[リサーチ] ${targetInput || genre}`, currentMarkdown);
-        showToast('リサーチが完了しました！');
-
-      } catch (err) {
-        showToast(`エラー: ${err.message}`, true);
-      } finally {
-        document.getElementById('loadingArea').classList.add('hidden');
-      }
-    }
-
-    // STEP 1.5: 連載マガジンロードマップ作成ハンドラー
-    async function handleSeriesSubmit(e) {
-      e.preventDefault();
-      const workerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
-      const theme = document.getElementById('seriesTheme').value.trim();
-      const target = document.getElementById('seriesTarget').value.trim();
-
-      if (!theme) return;
-
-      document.getElementById('loadingTitle').textContent = '全5話の連載マガジン企画を作成中...';
-      document.getElementById('loadingSubtitle').textContent = '継続購入を生む全体ロードマップと各話タイトル・価格戦略をAIが設計中（15〜20秒）';
-      document.getElementById('loadingArea').classList.remove('hidden');
-      document.getElementById('resultArea').classList.add('hidden');
-
-      try {
-        if (workerUrl) {
-          const response = await fetch(workerUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'generate_series', theme, target })
-          });
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.error || 'エラーが発生しました');
-          currentMarkdown = data.result;
-        }
-
-        document.getElementById('resultHeaderTitle').innerHTML = '<i class="fa-solid fa-layer-group text-purple-600"></i> 全5話完結マガジン連載ロードマップ企画書';
-        document.getElementById('btnCopyHashtags').classList.add('hidden');
-        document.getElementById('btnCopyArticle').classList.add('hidden');
-        document.getElementById('btnCopySns').classList.add('hidden');
-        document.getElementById('btnCopyMj').classList.add('hidden');
-        document.getElementById('btnCopyVideo').classList.add('hidden');
-        document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
-
-        renderSeriesEpisodeButtons(currentMarkdown, target);
-
-        document.getElementById('resultArea').classList.remove('hidden');
-        document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
-
-        saveToHistory(`[連載企画] ${theme}`, currentMarkdown);
-        showToast('連載マガジンロードマップ企画が作成されました！');
-
-      } catch (err) {
-        showToast(`エラー: ${err.message}`, true);
-      } finally {
-        document.getElementById('loadingArea').classList.add('hidden');
-      }
-    }
-
-    function renderSeriesEpisodeButtons(markdown, defaultTarget) {
-      const actionArea = document.getElementById('themeActionArea');
-      const actionButtons = document.getElementById('themeActionButtons');
-      actionButtons.innerHTML = '';
-
-      const matches = [...markdown.matchAll(/(?:###?\s*)?【第([12345])話】\s*(.*?)$/gm)];
-
-      if (matches.length > 0) {
-        matches.forEach((match) => {
-          const epNum = match[1];
-          let rawTitle = match[2].trim();
-
-          const btn = document.createElement('button');
-          btn.className = 'w-full bg-white border border-purple-300 hover:border-blue-500 hover:bg-blue-50 text-slate-800 p-3 rounded-xl transition text-left cursor-pointer flex flex-col justify-between shadow-xs group';
-          btn.onclick = () => applyThemeAndSwitch(`【第${epNum}話】${rawTitle}`, defaultTarget);
-          btn.innerHTML = `
-            <div>
-              <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 mb-1">第${epNum}話</span>
-              <p class="text-xs font-bold text-slate-900 group-hover:text-blue-700 line-clamp-2 leading-snug">${escapeHtml(rawTitle)}</p>
-            </div>
-            <div class="mt-2 text-[10px] text-blue-600 font-bold flex items-center justify-between border-t border-slate-100 pt-1.5">
-              <span>この話の目次案を作成する</span>
-              <i class="fa-solid fa-arrow-right text-[10px]"></i>
-            </div>
-          `;
-          actionButtons.appendChild(btn);
+      const apiKey = env.GEMINI_API_KEY || '';
+      if (!apiKey) {
+        return new Response(JSON.stringify({ error: 'Gemini API Key is not set in Worker environment variables.' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
-        actionArea.classList.remove('hidden');
-      } else {
-        actionArea.classList.add('hidden');
       }
-    }
 
-    function renderThemeActionButtons(markdown, defaultTarget) {
-      const actionArea = document.getElementById('themeActionArea');
-      const actionButtons = document.getElementById('themeActionButtons');
-      actionButtons.innerHTML = '';
+      let prompt = '';
 
-      const matches = [...markdown.matchAll(/(?:###?\s*)?(?:🥇|🥈|🥉)?\s*第([123])位[:：]\s*【?(.*?)】?$/gm)];
-      const targetMatches = [...markdown.matchAll(/・\*\*ターゲット読者:\*\*\s*(.*)$/gm)];
+      // 共通指示：表・罫線の禁止ルール
+      const NO_TABLE_NO_HR_RULE = `
+【最重要：整形・装飾の絶対ルール】
+1. **罫線（--- や === など）は一切使用しないでください。**
+2. **表（Markdownテーブル |---|---| など）は一切使用しないでください。**
+3. 情報を整理・比較する際は、必ず「箇条書き（・や1. 2. 3.）」または「分かりやすい小見出しと段落文章」で記載してください。
+4. noteやWordに直接コピペした際、レイアウトが崩れず極めて読みやすい文章構成にしてください。
+`;
 
-      if (matches.length > 0) {
-        matches.forEach((match, index) => {
-          let rawTitle = match[2].replace(/[【】]/g, '').trim();
-          if (rawTitle.includes('\n')) {
-            rawTitle = rawTitle.split('\n')[0].trim();
-          }
+      // アクション1: HARMディープリサーチ
+      if (action === 'find_themes') {
+        if (mode === 'target_concerns') {
+          prompt = `
+あなたは有料noteマーケティングのトッププロです。
+ターゲット層: "${targetInput}"
 
-          const badge = index === 0 ? '🥇 1位' : index === 1 ? '🥈 2位' : '🥉 3位';
-          const targetText = targetMatches[index] ? targetMatches[index][1].trim() : defaultTarget;
+上記のターゲット層が夜も眠れないほど深く悩んでいる「HARM法則（Health/Ambition/Relation/Money）」に基づく切実な悩みBEST3を分析抽出し、以下のフォーマットで出力してください。
 
-          const btnContainer = document.createElement('div');
-          btnContainer.className = 'w-full bg-white border border-amber-300 p-3 rounded-xl flex flex-col justify-between shadow-xs gap-2';
+${NO_TABLE_NO_HR_RULE}
 
-          btnContainer.innerHTML = `
-            <div>
-              <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 mb-1">${badge}</span>
-              <p class="text-xs font-bold text-slate-900 line-clamp-2 leading-snug">${escapeHtml(rawTitle)}</p>
-            </div>
-            <div class="grid grid-cols-2 gap-1.5 pt-2 border-t border-slate-100">
-              <button onclick="applyThemeAndSwitch('${escapeHtml(rawTitle)}', '${escapeHtml(targetText)}')" class="px-2 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer">
-                <i class="fa-solid fa-file-pen text-[10px]"></i> 単発目次
-              </button>
-              <button onclick="applySeriesAndSwitch('${escapeHtml(rawTitle)}', '${escapeHtml(targetText)}')" class="px-2 py-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer">
-                <i class="fa-solid fa-layer-group text-[10px]"></i> 5話連載化
-              </button>
-            </div>
-          `;
-          actionButtons.appendChild(btnContainer);
+【出力フォーマット】
+# 🎯 ターゲット層の切実な悩み分析リサーチ結果
+
+### 🥇 第1位：【ここに最も切実な悩みのタイトル】
+・**悩みカテゴリー:** （Health / Ambition / Relation / Money のいずれか）
+・**ターゲット読者:** ${targetInput}
+・**潜在的な本音・痛みの声:** 読者が心の中で叫んでいる生の感情
+・**解決後の理想の未来（ベネフィット）:** 記事を読むことで手に入る状態
+
+### 🥈 第2位：【ここに2番目に切実な悩みのタイトル】
+・**悩みカテゴリー:** （Health / Ambition / Relation / Money のいずれか）
+・**ターゲット読者:** ${targetInput}
+・**潜在的な本音・痛みの声:** 読者が心の中で叫んでいる生の感情
+・**解決後の理想の未来（ベネフィット）:** 記事を読むことで手に入る状態
+
+### 🥉 第3位：【ここに3番目に切実な悩みのタイトル】
+・**悩みカテゴリー:** （Health / Ambition / Relation / Money のいずれか）
+・**ターゲット読者:** ${targetInput}
+・**潜在的な本音・痛みの声:** 読者が心の中で叫んでいる生の感情
+・**解決後の理想の未来（ベネフィット）:** 記事を読むことで手に入る状態
+`;
+        } else {
+          prompt = `
+ジャンル: "${genre}"
+
+上記ジャンルにおいて、X（旧Twitter）やnoteでバズりやすく売れやすい「切り口テーマBEST3」を抽出してください。
+
+${NO_TABLE_NO_HR_RULE}
+
+【出力フォーマット】
+# 📂 ジャンル「${genre}」でバズるテーマBEST3
+
+### 🥇 第1位：【高単価で売れる切り口テーマ名】
+・**ターゲット読者:** 具体的なペルソナ
+・**売れる理由・背景:** なぜ今このテーマが買われるのか
+
+### 🥈 第2位：【高単価で売れる切り口テーマ名】
+・**ターゲット読者:** 具体的なペルソナ
+・**売れる理由・背景:** なぜ今このテーマが買われるのか
+
+### 🥉 第3位：【高単価で売れる切り口テーマ名】
+・**ターゲット読者:** 具体的なペルソナ
+・**売れる理由・背景:** なぜ今このテーマが買われるのか
+`;
+        }
+      } 
+      // アクション1.5: 5話完結マガジン連載ロードマップ作成
+      else if (action === 'generate_series') {
+        prompt = `
+メインテーマ: "${theme}"
+ターゲット層: "${target}"
+
+読者が単発1記事で終わらず、全5話を継続購入して確実に成長・悩み解決できる「全5話マガジン連載ロードマップ企画」を設計してください。
+
+${NO_TABLE_NO_HR_RULE}
+
+【出力形式】
+# 📚 全5話完結マガジン連載ロードマップ企画書：${theme}
+
+## 1. マガジン全体コンセプト ＆ 販売オファー戦略
+・**全体テーマ:** ${theme}
+・**ターゲット読者:** ${target}
+・**全5話読了後の到達ゴール:** 読者が手に入れる具体的な変化
+・**販売価格オファー戦略:**
+  ・1話ごとの単品価格: 各500円（5話合計2,500円）
+  ・全5話まとめ売り（マガジン）価格: 1,980円（20%OFFでお得感を提示し、高単価を一発獲得）
+
+## 2. 全5話の構成ロードマップ
+
+### 【第1話】 【ここに第1話のタイトル】
+・**本話の役割:** 意識改革・失敗の原因可視化
+・**読者の状態変化:** 「自分にもできそう！」と希望を持つ
+
+### 【第2話】 【ここに第2話のタイトル】
+・**本話の役割:** 基礎実践・即効ノウハウの導入
+・**読者の状態変化:** 最初の小さな成功体験を得る
+
+### 【第3話】 【ここに第3話のタイトル】
+・**本話の役割:** 応用展開・実践テンプレートの活用
+・**読者の状態変化:** 業務や生活の中で日常使いできるようになる
+
+### 【第4話】 【ここに第4話のタイトル】
+・**本話の役割:** 失敗回避・トラブルシューティング
+・**読者の状態変化:** 挫折する罠を回避し、確信に変わる
+
+### 【第5話】 【ここに第5話のタイトル】
+・**本話の役割:** 発展・収益化または継続化
+・**読者の状態変化:** 自立して次のステップへ進む
+`;
+      }
+      // アクション2: 目次案（章立て）の事前作成
+      else if (action === 'generate_toc') {
+        prompt = `
+メインテーマ: "${theme}"
+ターゲット: "${target}"
+文章トーン: "${tone}"
+
+上記条件に基づき、有料note記事として読者が思わず購入したくなる「黄金目次構成案（章立てプロット）」を作成してください。
+
+${NO_TABLE_NO_HR_RULE}
+
+【目次構成案の基準】
+・第1章：導入と共感（悩みの再確認）
+・第2章：挫折する共通の原因・思考の罠
+・第3章：解決のためのステップ解説（無料部分と有料境界線）
+・第4章：明日から使える具体的実践手順・ノウハウ（有料部分）
+・第5章：コピペで使えるテンプレート・チェックリスト（有料特典）
+・第6章：おわりに・著者メッセージ
+
+【出力フォーマット】
+# 黄金目次構成案：${theme}
+
+第1章：【タイトル】
+・小見出し1-1
+・小見出し1-2
+
+第2章：【タイトル】
+・小見出し2-1
+・小見出し2-2
+
+第3章：【タイトル】
+・小見出し3-1
+・小見出し3-2
+（※ここに有料境界線を設置）
+
+第4章：【タイトル】
+・小見出し4-1
+・小見出し4-2
+
+第5章：【タイトル】
+・小見出し5-1
+・小見出し5-2
+
+第6章：おわりに（著者メッセージ＆お問い合わせ）
+`;
+      }
+      // アクション3: 確定目次ベースの完全パッケージ一括生成
+      else if (action === 'generate_full') {
+        prompt = `
+テーマ: "${theme}"
+ターゲット: "${target}"
+文章トーン: "${tone}"
+パッケージ形式: "${packageType}"
+
+【確定された目次構成案】
+${approvedToc}
+
+【最重要命令：脱AI文章ルール】
+AI特有の無機質な定型文（「〜について解説します」「いかがでしたでしょうか」「〜が重要です」など）を徹底排除し、人間味のある生の言葉、感情のこもった文体で執筆してください。
+
+${NO_TABLE_NO_HR_RULE}
+
+【出力内容】
+1. タイトル案（3選） ＆ 5大ハッシュタグ
+2. note記事原稿（確定目特に完全準拠し、本文をしっかり執筆）
+   ※有料境界線フレーズと有料目次チラ見せを挿入すること。
+   ※packageTypeが "full_package" の場合はWord添付用の特典内容も末尾に含めること。
+3. 4大SNS集客告知コピー（X, Threads, Instagram, Facebook）
+4. Midjourney用note見出し画像プロンプト
+5. 32秒ショート動画構成＆AI動画（Flow / Veo 3.1）プロンプト
+
+【著者・問い合わせ情報（記事末尾に必ず記載）】
+著者: YoshiBon ｜ Smile Plus Consulting（SPC）
+メッセージ: “難しい言葉を使わず、AIとWebを『人の温度』で伝える専門家”
+LINE公式: https://lin.ee/Oh9LUpw
+公式サイト: https://www.smileplusctg.com/
+`;
+      } else {
+        return new Response(JSON.stringify({ error: 'Invalid Action' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
-        actionArea.classList.remove('hidden');
-      } else {
-        actionArea.classList.add('hidden');
-      }
-    }
-
-    function applyThemeAndSwitch(themeTitle, targetText) {
-      document.getElementById('theme').value = themeTitle;
-      if (targetText) {
-        document.getElementById('target').value = targetText;
-      }
-      switchTab('toc');
-      document.getElementById('sectionTocBuilder').scrollIntoView({ behavior: 'smooth' });
-      showToast(`「${themeTitle.substring(0, 15)}...」を目次生成にセットしました！`);
-    }
-
-    function applySeriesAndSwitch(themeTitle, targetText) {
-      document.getElementById('seriesTheme').value = themeTitle;
-      if (targetText) {
-        document.getElementById('seriesTarget').value = targetText;
-      }
-      switchTab('series');
-      document.getElementById('sectionSeriesBuilder').scrollIntoView({ behavior: 'smooth' });
-      showToast(`「${themeTitle.substring(0, 15)}...」を全5話連載企画にセットしました！`);
-    }
-
-    // STEP 2: 目次生成リクエスト
-    async function handleTocSubmit(e) {
-      e.preventDefault();
-      const workerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
-      const theme = document.getElementById('theme').value.trim();
-      const target = document.getElementById('target').value.trim();
-      const tone = document.getElementById('tone').value;
-      const packageType = document.querySelector('input[name="packageType"]:checked').value;
-
-      if (!theme) return;
-
-      document.getElementById('loadingTitle').textContent = '売れる目次構成案を作成中...';
-      document.getElementById('loadingSubtitle').textContent = '誰が見ても理解できる黄金目次プロットをAIが構成中（10〜15秒）';
-      document.getElementById('loadingArea').classList.remove('hidden');
-
-      try {
-        if (workerUrl) {
-          const response = await fetch(workerUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'generate_toc', theme, target, tone, packageType })
-          });
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.error || 'エラーが発生しました');
-          
-          document.getElementById('tocEditor').value = data.result;
-          document.getElementById('tocEditorContainer').classList.remove('hidden');
-          document.getElementById('tocEditorContainer').scrollIntoView({ behavior: 'smooth' });
-          showToast('目次構成案を作成しました！必要に応じて修正してください。');
-        }
-      } catch (err) {
-        showToast(`エラー: ${err.message}`, true);
-      } finally {
-        document.getElementById('loadingArea').classList.add('hidden');
-      }
-    }
-
-    // STEP 3: 確定した目次から完全パッケージを一括生成
-    async function proceedToFullGeneration() {
-      const workerUrl = localStorage.getItem(STORAGE_KEY_WORKER);
-      const theme = document.getElementById('theme').value.trim();
-      const target = document.getElementById('target').value.trim();
-      const tone = document.getElementById('tone').value;
-      const packageType = document.querySelector('input[name="packageType"]:checked').value;
-      const approvedToc = document.getElementById('tocEditor').value.trim();
-
-      if (!approvedToc) {
-        showToast('目次案を入力してください。', true);
-        return;
       }
 
-      document.getElementById('loadingTitle').textContent = '完全パッケージを一括構築中...';
-      document.getElementById('loadingSubtitle').textContent = '確定された目十分に完全準拠し、脱AI文章で執筆中（20〜30秒）';
-      document.getElementById('loadingArea').classList.remove('hidden');
-      document.getElementById('resultArea').classList.add('hidden');
+      // Gemini APIへのリクエスト実行
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+      const payload = {
+        contents: [{ parts: [{ text: prompt }] }]
+      };
 
-      try {
-        if (workerUrl) {
-          const response = await fetch(workerUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'generate_full', theme, target, tone, packageType, approvedToc })
-          });
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.error || 'エラーが発生しました');
-          currentMarkdown = data.result;
-        }
+      const geminiRes = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-        document.getElementById('resultHeaderTitle').innerHTML = '<i class="fa-solid fa-file-lines text-note-600"></i> 生成結果（確定目次ベース完全コピペパッケージ）';
-        document.getElementById('btnCopyHashtags').classList.remove('hidden');
-        document.getElementById('btnCopyArticle').classList.remove('hidden');
-        document.getElementById('btnCopySns').classList.remove('hidden');
-        document.getElementById('btnCopyMj').classList.remove('hidden');
-        document.getElementById('btnCopyVideo').classList.remove('hidden');
-        document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
-        document.getElementById('resultArea').classList.remove('hidden');
-        document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
-
-        saveToHistory(theme, currentMarkdown);
-        showToast('完全パッケージの生成が完了しました！');
-
-      } catch (err) {
-        showToast(`エラー: ${err.message}`, true);
-      } finally {
-        document.getElementById('loadingArea').classList.add('hidden');
-      }
-    }
-
-    function copyToClipboard() {
-      if (!currentMarkdown) {
-        showToast('コピーするコンテンツがありません', true);
-        return;
-      }
-      copyText(currentMarkdown, '全文をコピーしました！');
-    }
-
-    function copyHashtagsToClipboard() {
-      if (!currentMarkdown) return;
-      const matches = currentMarkdown.match(/#[^\s#]+/g);
-      if (matches && matches.length > 0) {
-        const uniqueHashtags = [...new Set(matches)];
-        copyText(uniqueHashtags.join(' '), 'ハッシュタグをコピーしました！');
-      } else {
-        showToast('ハッシュタグが見つかりませんでした', true);
-      }
-    }
-
-    function copyArticleAndBonusToClipboard() {
-      if (!currentMarkdown) return;
-      const match = currentMarkdown.match(/(?:#+\s*2\.\s*note記事原稿|##\s*2\.)[\s\S]*?(?=#+\s*(?:3\.|4\.|5\.)?\s*4大SNS|#+\s*4大SNS|#+\s*note見出し画像|$)/i);
-      if (match && match[0].trim()) {
-        copyText(match[0].trim(), 'note原稿（＋Word特典）をコピーしました！');
-      } else {
-        const idx = currentMarkdown.indexOf('note記事原稿');
-        if (idx !== -1) {
-          const snsIdx = currentMarkdown.search(/4大SNS|SNS集客告知|Midjourney/i);
-          const content = snsIdx > idx ? currentMarkdown.substring(idx, snsIdx) : currentMarkdown.substring(idx);
-          copyText(content.trim(), 'note原稿をコピーしました！');
-        } else {
-          copyText(currentMarkdown, 'note原稿をコピーしました！');
-        }
-      }
-    }
-
-    function copySnsToClipboard() {
-      if (!currentMarkdown) return;
-      const match = currentMarkdown.match(/(?:#+\s*(?:3|4)\.\s*4大SNS|#+\s*4大SNS集客告知コピー)[\s\S]*?(?=#+\s*(?:4|5|6)\.\s*note見出し画像|#+\s*note見出し画像|#+\s*Flow|$)/i);
-      if (match && match[0].trim()) {
-        copyText(match[0].trim(), '4大SNS集客告知コピーをコピーしました！');
-      } else {
-        const snsIdx = currentMarkdown.search(/4大SNS|SNS集客告知/i);
-        if (snsIdx !== -1) {
-          const imgIdx = currentMarkdown.search(/Midjourney|note見出し画像|Flow \/ Veo/i);
-          const content = imgIdx > snsIdx ? currentMarkdown.substring(snsIdx, imgIdx) : currentMarkdown.substring(snsIdx);
-          copyText(content.trim(), '4大SNS集客告知コピーをコピーしました！');
-        } else {
-          copyText(currentMarkdown, 'SNS告知コピーをコピーしました！');
-        }
-      }
-    }
-
-    function copyMidjourneyToClipboard() {
-      if (!currentMarkdown) return;
-      const match = currentMarkdown.match(/(?:#+\s*(?:4|5)\.\s*note見出し画像|#+\s*note見出し画像)[\s\S]*?(?=#+\s*(?:5|6)\.\s*Flow|#+\s*Flow \/ Veo|$)/i);
-      if (match && match[0].trim()) {
-        copyText(match[0].trim(), 'Midjourney用プロンプトをコピーしました！');
-      } else {
-        const mjIdx = currentMarkdown.search(/Midjourney|note見出し画像/i);
-        if (mjIdx !== -1) {
-          const videoIdx = currentMarkdown.search(/Flow \/ Veo/i);
-          const content = videoIdx > mjIdx ? currentMarkdown.substring(mjIdx, videoIdx) : currentMarkdown.substring(mjIdx);
-          copyText(content.trim(), 'Midjourney用プロンプトをコピーしました！');
-        } else {
-          copyText(currentMarkdown, 'サムネイルプロンプトをコピーしました！');
-        }
-      }
-    }
-
-    function copyVideoToClipboard() {
-      if (!currentMarkdown) return;
-      const match = currentMarkdown.match(/(?:#+\s*(?:5|6)\.\s*Flow|#+\s*Flow \/ Veo)[\s\S]*/i);
-      if (match && match[0].trim()) {
-        copyText(match[0].trim(), '🎬 ショート動画プロンプト一式をコピーしました！');
-      } else {
-        const videoIdx = currentMarkdown.search(/Flow \/ Veo|ショート動画構成/i);
-        if (videoIdx !== -1) {
-          copyText(currentMarkdown.substring(videoIdx).trim(), '🎬 ショート動画プロンプト一式をコピーしました！');
-        } else {
-          copyText(currentMarkdown, '動画プロンプトをコピーしました！');
-        }
-      }
-    }
-
-    // クリップボードへの堅牢なコピー関数（非同期API ＋ フォールバック処理）
-    function copyText(text, message) {
-      if (!text) {
-        showToast('コピーするコンテンツがありません', true);
-        return;
+      if (!geminiRes.ok) {
+        const errText = await geminiRes.text();
+        return new Response(JSON.stringify({ error: `Gemini API Error: ${errText}` }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(text)
-          .then(() => showToast(message))
-          .catch(() => fallbackCopy(text, message));
-      } else {
-        fallbackCopy(text, message);
-      }
+      const geminiData = await geminiRes.json();
+      const generatedText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '生成結果を取得できませんでした。';
+
+      return new Response(JSON.stringify({ result: generatedText }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+
+    } catch (err) {
+      return new Response(JSON.stringify({ error: err.message }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
-
-    // ブラウザのセキュリティブロックを回避する堅牢なフォールバックコピー処理
-    function fallbackCopy(text, message) {
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      
-      textarea.style.position = 'fixed';
-      textarea.style.top = '0';
-      textarea.style.left = '0';
-      textarea.style.width = '2em';
-      textarea.style.height = '2em';
-      textarea.style.padding = '0';
-      textarea.style.border = 'none';
-      textarea.style.outline = 'none';
-      textarea.style.boxShadow = 'none';
-      textarea.style.background = 'transparent';
-      textarea.style.opacity = '0';
-      textarea.setAttribute('readonly', '');
-      
-      document.body.appendChild(textarea);
-      
-      textarea.focus();
-      textarea.select();
-      textarea.setSelectionRange(0, textarea.value.length);
-
-      try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          showToast(message);
-        } else {
-          showToast('コピーに失敗しました。手動でテキストを選択してコピーしてください。', true);
-        }
-      } catch (err) {
-        showToast('コピー中にエラーが発生しました', true);
-      } finally {
-        document.body.removeChild(textarea);
-      }
-    }
-
-    function downloadAsText() {
-      if (!currentMarkdown) return;
-      const theme = document.getElementById('theme').value.trim() || 'note_research';
-      const blob = new Blob([currentMarkdown], { type: 'text/plain;charset=utf-8' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `${theme}_完成パッケージ.txt`;
-      link.click();
-      showToast('テキストファイルをダウンロードしました！');
-    }
-
-    function saveToHistory(theme, content) {
-      let history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY) || '[]');
-      history.unshift({ id: Date.now(), theme: theme, date: new Date().toLocaleDateString('ja-JP'), content: content });
-      if (history.length > 5) history.pop();
-      localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
-      renderHistory();
-    }
-
-    function renderHistory() {
-      const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY) || '[]');
-      const section = document.getElementById('historySection');
-      const list = document.getElementById('historyList');
-
-      if (history.length === 0) {
-        section.classList.add('hidden');
-        return;
-      }
-
-      section.classList.remove('hidden');
-      list.innerHTML = history.map(item => `
-        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition cursor-pointer" onclick="loadHistoryItem(${item.id})">
-          <div class="truncate pr-4">
-            <p class="text-xs font-bold text-slate-800 truncate">${escapeHtml(item.theme)}</p>
-            <p class="text-[10px] text-slate-400">${item.date}</p>
-          </div>
-          <span class="text-xs text-note-600 font-semibold flex items-center gap-1 shrink-0">
-            表示 <i class="fa-solid fa-chevron-right text-[10px]"></i>
-          </span>
-        </div>
-      `).join('');
-    }
-
-    function loadHistoryItem(id) {
-      const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY) || '[]');
-      const item = history.find(h => h.id === id);
-      if (item) {
-        currentMarkdown = item.content;
-        document.getElementById('resultContent').innerHTML = marked.parse(currentMarkdown);
-        document.getElementById('themeActionArea').classList.add('hidden');
-        document.getElementById('resultArea').classList.remove('hidden');
-        document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
-        showToast('履歴を読み込みました');
-      }
-    }
-
-    function clearHistory() {
-      localStorage.removeItem(STORAGE_KEY_HISTORY);
-      renderHistory();
-      showToast('履歴を全消去しました');
-    }
-
-    function escapeHtml(str) {
-      return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
-    }
-  </script>
-</body>
-</html>
+  }
+};
